@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown to Resume Converter</title>
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* UI Controls Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .controls {
+            background: #fff;
+            padding: 15px 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #004494;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        /* Resume Container Styling with CSS Variables */
+        #resume-wrapper {
+            --resume-width: 210mm;
+            --hr-margin: 10px;
+            --font-base: 11pt;
+            --font-h1: 24pt;
+            --font-h2: 14pt;
+            --font-h3: 12pt;
+            --font-family: 'Bookerly', 'Georgia', 'Times New Roman', serif;
+            --line-height: 1.5;
+            --page-padding: 20mm;
+
+            background-color: white;
+            width: var(--resume-width);
+            min-height: 297mm;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-sizing: border-box;
+            padding: var(--page-padding);
+            font-family: var(--font-family);
+            font-size: var(--font-base);
+            line-height: var(--line-height);
+            color: #000;
+        }
+
+        /* Typography & Layout */
+        #resume-content h1 {
+            font-size: var(--font-h1);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-weight: normal;
+        }
+        #resume-content h2 {
+            font-size: var(--font-h2);
+            border-bottom: 1px solid #000;
+            padding-bottom: 2px;
+            margin-top: 15pt;
+            margin-bottom: 8pt;
+            text-transform: uppercase;
+        }
+        #resume-content h3 {
+            font-size: var(--font-h3);
+            margin-top: 10pt;
+            margin-bottom: 2pt;
+        }
+        #resume-content p {
+            margin-top: 0;
+            margin-bottom: 8pt;
+        }
+        #resume-content ul {
+            margin-top: 2pt;
+            margin-bottom: 8pt;
+            padding-left: 20pt;
+        }
+        #resume-content li {
+            margin-bottom: 3pt;
+        }
+        #resume-content hr {
+            border: none;
+            border-top: 1px solid #000;
+            margin-top: var(--hr-margin);
+            margin-bottom: var(--hr-margin);
+        }
+
+        /* Links underlined by default */
+        #resume-content a {
+            color: #000;
+            text-decoration: underline;
+        }
+
+        /* Flex row for <left> and <right> tags on the same line */
+        .flex-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            width: 100%;
+            margin-bottom: 4px;
+        }
+
+        /* Print setup for selectable text PDF generation */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+            body {
+                background: none;
+                padding: 0;
+                margin: 0;
+            }
+            .controls {
+                display: none !important;
+            }
+            #resume-wrapper {
+                box-shadow: none !important;
+                width: 100% !important;
+                min-height: auto !important;
+                padding: var(--page-padding) !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <input type="file" id="md-file" accept=".md,text/markdown">
+    <button id="download-btn" disabled>Save as PDF</button>
+</div>
+
+<div id="resume-wrapper">
+    <div id="resume-content">
+        <h1 style="color: #888; text-align: center; margin-top: 50px;">Upload a Markdown file or place resume.md in directory</h1>
+    </div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('md-file');
+    const downloadBtn = document.getElementById('download-btn');
+    const resumeContent = document.getElementById('resume-content');
+    const resumeWrapper = document.getElementById('resume-wrapper');
+
+    // Default configuration
+    const defaultConfig = {
+        width: '210mm',
+        hrMargin: '10px',
+        fontBase: '11pt',
+        fontH1: '24pt',
+        fontH2: '14pt',
+        fontH3: '12pt',
+        fontFamily: "'Bookerly', 'Georgia', 'Times New Roman', serif",
+        lineHeight: '1.5',
+        pagePadding: '20mm'
+    };
+
+    // Extract frontmatter config at the top of the file if present
+    function parseConfigAndMarkdown(text) {
+        const config = { ...defaultConfig };
+        let cleanText = text;
+
+        // Match frontmatter block (--- ... --- or <!-- ... -->)
+        const frontmatterMatch = text.match(/^---\s*\n([\s\S]*?)\n---\s*\n/) || text.match(/^<!--\s*([\s\S]*?)\s*-->/);
+
+        if (frontmatterMatch) {
+            const configBlock = frontmatterMatch[1];
+            cleanText = text.replace(frontmatterMatch[0], '');
+
+            configBlock.split('\n').forEach(line => {
+                const [key, ...valParts] = line.split(':');
+                if (key && valParts.length) {
+                    const k = key.trim().toLowerCase();
+                    const v = valParts.join(':').trim();
+
+                    if (k === 'resume-width' || k === 'width') config.width = v;
+                    if (k === 'hr-margin' || k === 'margin-hr' || k === 'hr vertical margin') config.hrMargin = v;
+                    if (k === 'font-size-base' || k === 'font-base' || k === 'font-size') config.fontBase = v;
+                    if (k === 'font-size-h1' || k === 'font-h1' || k === 'h1-size') config.fontH1 = v;
+                    if (k === 'font-size-h2' || k === 'font-h2' || k === 'h2-size') config.fontH2 = v;
+                    if (k === 'font-size-h3' || k === 'font-h3' || k === 'h3-size') config.fontH3 = v;
+                    if (k === 'font-family' || k === 'font') config.fontFamily = v;
+                    if (k === 'line-height') config.lineHeight = v;
+                    if (k === 'page-padding' || k === 'padding') config.pagePadding = v;
+                }
+            });
+        }
+
+        return { config, markdown: cleanText };
+    }
+
+    // Pre-process <left> and <right> tags into flexbox rows
+    function preprocessLeftRight(text) {
+        // Match <left>...</left> followed by optional whitespace and <right>...</right>
+        return text.replace(
+            /<left>([\s\S]*?)<\/left>\s*<right>([\s\S]*?)<\/right>/gi,
+            (match, left, right) => {
+                const leftHtml = marked.parseInline(left.trim());
+                const rightHtml = marked.parseInline(right.trim());
+                return `<div class="flex-row"><span>${leftHtml}</span><span>${rightHtml}</span></div>`;
+            }
+        );
+    }
+
+    function applyStyles(config) {
+        resumeWrapper.style.setProperty('--resume-width', config.width);
+        resumeWrapper.style.setProperty('--hr-margin', config.hrMargin);
+        resumeWrapper.style.setProperty('--font-base', config.fontBase);
+        resumeWrapper.style.setProperty('--font-h1', config.fontH1);
+        resumeWrapper.style.setProperty('--font-h2', config.fontH2);
+        resumeWrapper.style.setProperty('--font-h3', config.fontH3);
+        resumeWrapper.style.setProperty('--font-family', config.fontFamily);
+        resumeWrapper.style.setProperty('--line-height', config.lineHeight);
+        resumeWrapper.style.setProperty('--page-padding', config.pagePadding);
+    }
+
+    function renderMarkdown(rawText) {
+        const { config, markdown } = parseConfigAndMarkdown(rawText);
+        applyStyles(config);
+        const processedMarkdown = preprocessLeftRight(markdown);
+        resumeContent.innerHTML = marked.parse(processedMarkdown);
+        downloadBtn.disabled = false;
+    }
+
+    // Auto-load resume.md if present
+    window.addEventListener('DOMContentLoaded', () => {
+        fetch('resume.md')
+            .then(response => response.ok ? response.text() : Promise.reject())
+            .then(text => renderMarkdown(text))
+            .catch(() => {});
+    });
+
+    // Handle manual upload
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => renderMarkdown(e.target.result);
+        reader.readAsText(file);
+    });
+
+    // Trigger native browser PDF printing (ensures searchable/selectable text)
+    downloadBtn.addEventListener('click', () => {
+        window.print();
+    });
+</script>
+
+</body>
+</html>
