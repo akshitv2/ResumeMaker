@@ -4,7 +4,7 @@ font-size: 9pt
 line-height: 1.4
 text-color: "#222222"
 margin-top: 10mm
-margin-bottom: 15mm
+margin-bottom: 0mm
 margin-left: 15mm
 margin-right: 15mm
 link-underline: true

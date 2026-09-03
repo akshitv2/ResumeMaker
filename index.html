@@ -530,15 +530,35 @@
             .word-header, .word-ribbon, .editor-pane, .pane-header { display: none !important; }
             .workspace { height: auto !important; display: block !important; overflow: visible !important; }
             .preview-pane { width: 100% !important; padding: 0 !important; background: white !important; overflow: visible !important; }
+
             #resume-preview {
                 box-shadow: none !important;
                 width: 100% !important;
                 min-height: auto !important;
                 margin: 0 !important;
                 padding: var(--print-margin, 15mm) !important;
+                color: #000000 !important;
+                background: #ffffff !important;
             }
-            #resume-preview::before { display: none !important; }
-            @page { size: A4; margin: 0; }
+
+            /* Strip non-ATS printable styling */
+            #resume-preview * {
+                color: #000000 !important;
+                background: transparent !important;
+                -webkit-text-fill-color: #000000 !important;
+                background-clip: initial !important;
+                box-shadow: none !important;
+                text-shadow: none !important;
+            }
+            #resume-preview::before,
+            #resume-preview *::before,
+            #resume-preview *::after {
+                display: none !important;
+            }
+            @page {
+                size: A4;
+                margin: 0; /* Removes browser-generated headers and footers */
+            }
         }
     </style>
 </head>
@@ -763,9 +783,16 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
     }
 
     function preprocessCustomLayoutTags(text) {
-        let processed = text.replace(/<left>([\s\S]*?)<\/left>\s*<right>([\s\S]*?)<\/right>/gi, '<span class="flex-row"><span class="flex-left">$1</span><span class="flex-right">$2</span></span>');
-        processed = processed.replace(/<left>([\s\S]*?)<\/left>/gi, '<span class="flex-left">$1</span>');
-        processed = processed.replace(/<right>([\s\S]*?)<\/right>/gi, '<span class="flex-right">$1</span>');
+        // 1. Process paired left/right tags first
+        let processed = text.replace(
+            /<left>([\s\S]*?)<\/left>\s*<right>([\s\S]*?)<\/right>/gi,
+            '<div class="flex-row"><div class="flex-left">$1</div><div class="flex-right">$2</div></div>'
+        );
+
+        // 2. Process standalone left or right tags if any remain
+        processed = processed.replace(/<left>([\s\S]*?)<\/left>/gi, '<div class="flex-left">$1</div>');
+        processed = processed.replace(/<right>([\s\S]*?)<\/right>/gi, '<div class="flex-right">$2</div>');
+
         return processed;
     }
 
@@ -785,10 +812,16 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
         saveStatus.textContent = 'Saved';
 
         const { config, mdContent } = parseFrontmatterAndConfig(rawText);
-        const preprocessedMd = preprocessCustomLayoutTags(mdContent);
 
-        preview.innerHTML = marked.parse(preprocessedMd);
+        // Parse Markdown FIRST so *italics* and **bold** inside tags get converted to HTML <em> and <strong>
+        let htmlContent = marked.parse(mdContent);
 
+        // Preprocess custom layout tags AFTER Markdown parsing
+        htmlContent = preprocessCustomLayoutTags(htmlContent);
+
+        preview.innerHTML = htmlContent;
+
+        // Apply styles from config...
         preview.style.fontFamily = config['font-family'] || '';
         preview.style.fontSize = config['font-size'] || '';
         preview.style.lineHeight = config['line-height'] || '';
