@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Creator</title>
+    <title>Resume Editor - Microsoft Word Style</title>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
@@ -145,7 +145,6 @@
             position: relative;
         }
 
-        /* A4 Container & Always-On Precise Page Break Overlay */
         #resume-preview {
             background: white;
             width: 210mm;
@@ -156,7 +155,6 @@
             transition: all 0.2s ease;
         }
 
-        /* Repeated exact A4 297mm cutoff lines */
         #resume-preview::before {
             content: "";
             position: absolute;
@@ -179,7 +177,11 @@
         .flex-left { text-align: left; }
         .flex-right { text-align: right; }
 
-        /* Themes */
+        /* ==========================================
+           BASE RESUME THEMES
+           ========================================== */
+
+        /* Theme 1: Formal Classic */
         .theme-formal {
             font-family: 'Georgia', 'Times New Roman', serif;
             font-size: 10.5pt;
@@ -192,6 +194,7 @@
         .theme-formal h3 { font-size: 11pt; margin-top: 8px; }
         .theme-formal ul { padding-left: 18px; margin-bottom: 8px; }
 
+        /* Theme 2: Modern Minimal */
         .theme-modern {
             font-family: 'Segoe UI', Arial, sans-serif;
             font-size: 10pt;
@@ -204,6 +207,7 @@
         .theme-modern h3 { font-size: 10.5pt; color: #2d3748; margin-top: 6px; }
         .theme-modern ul { padding-left: 16px; margin-bottom: 6px; }
 
+        /* Theme 3: Tech / Developer */
         .theme-tech {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             font-size: 9.5pt;
@@ -216,6 +220,7 @@
         .theme-tech h3 { font-size: 10pt; margin-top: 6px; }
         .theme-tech ul { padding-left: 16px; margin-bottom: 6px; }
 
+        /* Theme 4: Executive Navy */
         .theme-executive {
             font-family: 'Garamond', 'Hoefler Text', serif;
             font-size: 11pt;
@@ -228,6 +233,7 @@
         .theme-executive h3 { font-size: 11pt; margin-top: 8px; font-style: italic; }
         .theme-executive ul { padding-left: 18px; margin-bottom: 8px; }
 
+        /* Theme 5: Compact One-Page */
         .theme-compact {
             font-family: Arial, Helvetica, sans-serif;
             font-size: 9pt;
@@ -240,6 +246,144 @@
         .theme-compact h3 { font-size: 9.5pt; margin-top: 4px; }
         .theme-compact p, .theme-compact ul { margin-bottom: 4px; }
         .theme-compact ul { padding-left: 14px; }
+
+        /* ==========================================
+           5 CREATIVE THEMES
+           ========================================== */
+
+        /* Creative 1: Terracotta Accent */
+        .theme-creative-terracotta {
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', sans-serif;
+            font-size: 10pt;
+            line-height: 1.45;
+            color: #2d3748;
+            padding: 16mm;
+        }
+        .theme-creative-terracotta h1 { font-size: 23pt; color: #c05621; margin-bottom: 4px; letter-spacing: -0.5px; }
+        .theme-creative-terracotta h2 { font-size: 11pt; color: #c05621; border-left: 4px solid #c05621; padding-left: 8px; margin-top: 14px; margin-bottom: 8px; text-transform: uppercase; }
+        .theme-creative-terracotta h3 { font-size: 10.5pt; color: #2b6cb0; margin-top: 6px; }
+        .theme-creative-terracotta ul { padding-left: 18px; margin-bottom: 6px; }
+
+        /* Creative 2: Emerald Studio */
+        .theme-creative-emerald {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.4;
+            color: #1f2937;
+            padding: 15mm;
+        }
+        .theme-creative-emerald h1 { font-size: 24pt; color: #065f46; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 2px; }
+        .theme-creative-emerald h2 { font-size: 10.5pt; color: #047857; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #a7f3d0; padding-bottom: 2px; margin-top: 14px; margin-bottom: 8px; }
+        .theme-creative-emerald h3 { font-size: 10pt; color: #064e3b; margin-top: 6px; }
+        .theme-creative-emerald ul { padding-left: 16px; margin-bottom: 6px; }
+
+        /* Creative 3: Plum Elegance */
+        .theme-creative-plum {
+            font-family: 'Palatino', 'Palatino Linotype', Georgia, serif;
+            font-size: 10pt;
+            line-height: 1.45;
+            color: #3b0764;
+            padding: 18mm;
+        }
+        .theme-creative-plum h1 { font-size: 24pt; color: #701a75; text-align: center; margin-bottom: 4px; }
+        .theme-creative-plum h2 { font-size: 11.5pt; color: #86198f; text-align: center; border-bottom: 1px dashed #d8b4fe; padding-bottom: 4px; margin-top: 16px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1.5px; }
+        .theme-creative-plum h3 { font-size: 10.5pt; color: #581c87; margin-top: 6px; }
+        .theme-creative-plum ul { padding-left: 18px; margin-bottom: 6px; }
+
+        /* Creative 4: Indigo Badge */
+        .theme-creative-indigo {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.4;
+            color: #1e1b4b;
+            padding: 15mm;
+        }
+        .theme-creative-indigo h1 { font-size: 22pt; color: #3730a3; margin-bottom: 4px; }
+        .theme-creative-indigo h2 { font-size: 10pt; background: #e0e7ff; color: #3730a3; padding: 4px 10px; border-radius: 4px; display: inline-block; margin-top: 14px; margin-bottom: 8px; text-transform: uppercase; font-weight: 700; }
+        .theme-creative-indigo h3 { font-size: 10pt; color: #4338ca; margin-top: 6px; }
+        .theme-creative-indigo ul { padding-left: 16px; margin-bottom: 6px; }
+
+        /* Creative 5: Nordic Minimal Teal */
+        .theme-creative-nordic {
+            font-family: 'Century Gothic', 'CenturyGothic', AppleGothic, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.5;
+            color: #134e4a;
+            padding: 15mm;
+        }
+        .theme-creative-nordic h1 { font-size: 22pt; color: #0f766e; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+        .theme-creative-nordic h2 { font-size: 10pt; color: #0f766e; font-weight: 600; text-transform: uppercase; letter-spacing: 2.5px; border-bottom: 1px solid #99f6e4; padding-bottom: 3px; margin-top: 14px; margin-bottom: 8px; }
+        .theme-creative-nordic h3 { font-size: 9.5pt; color: #115e59; margin-top: 6px; }
+        .theme-creative-nordic ul { padding-left: 16px; margin-bottom: 6px; }
+
+        /* ==========================================
+           5 SIMPLE / FORMAL VARIATION THEMES
+           ========================================== */
+
+        /* Formal Var 1: Classic Serif Traditional */
+        .theme-formal-serif {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            line-height: 1.35;
+            color: #111827;
+            padding: 20mm;
+        }
+        .theme-formal-serif h1 { font-size: 22pt; text-align: center; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px; }
+        .theme-formal-serif h2 { font-size: 11.5pt; text-align: center; border-top: 1px solid #111827; border-bottom: 1px solid #111827; text-transform: uppercase; margin-top: 16px; margin-bottom: 8px; padding: 2px 0; letter-spacing: 1.5px; }
+        .theme-formal-serif h3 { font-size: 11pt; margin-top: 8px; font-weight: bold; }
+        .theme-formal-serif ul { padding-left: 20px; margin-bottom: 8px; }
+
+        /* Formal Var 2: Charcoal Clean */
+        .theme-formal-charcoal {
+            font-family: 'Calibri', 'Candara', Segoe, sans-serif;
+            font-size: 10.5pt;
+            line-height: 1.4;
+            color: #1f2937;
+            padding: 16mm;
+        }
+        .theme-formal-charcoal h1 { font-size: 22pt; color: #111827; margin-bottom: 2px; font-weight: bold; }
+        .theme-formal-charcoal h2 { font-size: 11pt; color: #374151; border-bottom: 1px solid #4b5563; text-transform: uppercase; margin-top: 14px; margin-bottom: 6px; font-weight: bold; }
+        .theme-formal-charcoal h3 { font-size: 10.5pt; color: #1f2937; margin-top: 6px; }
+        .theme-formal-charcoal ul { padding-left: 18px; margin-bottom: 6px; }
+
+        /* Formal Var 3: Slate Executive Band */
+        .theme-formal-slate {
+            font-family: 'Georgia', serif;
+            font-size: 10pt;
+            line-height: 1.4;
+            color: #334155;
+            padding: 18mm;
+        }
+        .theme-formal-slate h1 { font-size: 22pt; color: #1e293b; margin-bottom: 4px; }
+        .theme-formal-slate h2 { font-size: 10.5pt; color: #1e293b; background: #f1f5f9; padding: 3px 6px; border-bottom: 1px solid #cbd5e1; text-transform: uppercase; margin-top: 14px; margin-bottom: 8px; font-weight: bold; }
+        .theme-formal-slate h3 { font-size: 10pt; color: #334155; margin-top: 6px; }
+        .theme-formal-slate ul { padding-left: 18px; margin-bottom: 6px; }
+
+        /* Formal Var 4: Pure Monochrome */
+        .theme-formal-monochrome {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.4;
+            color: #000000;
+            padding: 15mm;
+        }
+        .theme-formal-monochrome h1 { font-size: 20pt; text-transform: uppercase; margin-bottom: 4px; font-weight: bold; }
+        .theme-formal-monochrome h2 { font-size: 10.5pt; text-transform: uppercase; border-bottom: 2px solid #000000; padding-bottom: 2px; margin-top: 14px; margin-bottom: 8px; font-weight: bold; }
+        .theme-formal-monochrome h3 { font-size: 10pt; margin-top: 6px; font-weight: bold; }
+        .theme-formal-monochrome ul { padding-left: 16px; margin-bottom: 6px; }
+
+        /* Formal Var 5: Corporate Navy Line */
+        .theme-formal-corporate {
+            font-family: 'Garamond', 'Georgia', serif;
+            font-size: 10.5pt;
+            line-height: 1.4;
+            color: #0f172a;
+            padding: 18mm;
+        }
+        .theme-formal-corporate h1 { font-size: 24pt; color: #1e3a8a; margin-bottom: 2px; font-weight: normal; }
+        .theme-formal-corporate h2 { font-size: 11pt; color: #1e3a8a; border-bottom: 2px solid #1e3a8a; text-transform: uppercase; margin-top: 14px; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.5px; }
+        .theme-formal-corporate h3 { font-size: 10.5pt; color: #1e293b; margin-top: 6px; font-style: italic; }
+        .theme-formal-corporate ul { padding-left: 18px; margin-bottom: 6px; }
 
         #resume-preview p { margin-bottom: 6px; }
         #resume-preview a { color: inherit; text-decoration: none; }
@@ -265,7 +409,7 @@
 
 <div class="word-header">
     <div class="title"><i class="fa-solid fa-file-word"></i> Resume Document Editor - Markdown Converter</div>
-    <div></div>
+    <div>Word UI Mode</div>
 </div>
 
 <div class="word-ribbon">
@@ -273,11 +417,27 @@
         <div class="control-item">
             <span class="ribbon-label">Resume Theme</span>
             <select id="theme-select">
-                <option value="theme-formal">Formal Classic</option>
-                <option value="theme-modern">Modern Minimal</option>
-                <option value="theme-tech">Tech / Developer</option>
-                <option value="theme-executive">Executive Navy</option>
-                <option value="theme-compact">Compact One-Page</option>
+                <optgroup label="Default Themes">
+                    <option value="theme-formal">Formal Classic</option>
+                    <option value="theme-modern">Modern Minimal</option>
+                    <option value="theme-tech">Tech / Developer</option>
+                    <option value="theme-executive">Executive Navy</option>
+                    <option value="theme-compact">Compact One-Page</option>
+                </optgroup>
+                <optgroup label="Creative Themes">
+                    <option value="theme-creative-terracotta">Creative Terracotta</option>
+                    <option value="theme-creative-emerald">Creative Emerald</option>
+                    <option value="theme-creative-plum">Creative Plum</option>
+                    <option value="theme-creative-indigo">Creative Indigo</option>
+                    <option value="theme-creative-nordic">Creative Nordic Teal</option>
+                </optgroup>
+                <optgroup label="Simple & Formal Variations">
+                    <option value="theme-formal-serif">Formal Serif Traditional</option>
+                    <option value="theme-formal-charcoal">Formal Charcoal Clean</option>
+                    <option value="theme-formal-slate">Formal Slate Band</option>
+                    <option value="theme-formal-monochrome">Formal Pure Monochrome</option>
+                    <option value="theme-formal-corporate">Formal Corporate Navy</option>
+                </optgroup>
             </select>
         </div>
     </div>
@@ -325,8 +485,8 @@
 </div>
 
 <script>
-    const DEFAULT_CONFIG_BLOCK = `<!--
-font-family: 'Georgia'
+    const DEFAULT_CONFIG_BLOCK = `---
+font-family: "Segoe UI", Arial, sans-serif
 font-size: 10pt
 line-height: 1.4
 text-color: "#222222"
@@ -339,37 +499,46 @@ link-color: "#0366d6"
 
 h1:
   font-size: 22pt
+  color: "#1a365d"
   align: center
   uppercase: true
+  underline: false
   underline-distance: 2px
 
 h2:
   font-size: 11pt
+  color: "#2b6cb0"
   align: left
   uppercase: true
+  underline: true
   underline-distance: 4px
 
 h3:
   font-size: 10.5pt
+  color: "#2d3748"
   align: left
   uppercase: false
+  underline: false
   underline-distance: 2px
 
 h4:
   font-size: 10pt
   align: left
   uppercase: false
+  underline: false
 
 h5:
   font-size: 9.5pt
   align: left
   uppercase: false
+  underline: false
 
 h6:
   font-size: 9pt
   align: left
   uppercase: false
--->
+  underline: false
+---
 
 `;
 
@@ -446,7 +615,6 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
                 try {
                     config = jsyaml.load(commentMatch[1]) || {};
                     mdContent = text.replace(/^<!--\r?\n([\s\S]*?)\r?\n-->/, '');
-                    console.log(config);
                 } catch (e) { console.error('Comment Config Parsing Error', e); }
             }
         }
@@ -481,13 +649,11 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
 
         preview.innerHTML = marked.parse(preprocessedMd);
 
-        // General Font & Text Styles
         preview.style.fontFamily = config['font-family'] || '';
         preview.style.fontSize = config['font-size'] || '';
         preview.style.lineHeight = config['line-height'] || '';
         preview.style.color = config['text-color'] || '';
 
-        // Heading Configurations (h1 through h6)
         ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(tag => {
             const elements = preview.querySelectorAll(tag);
             if (!elements.length) return;
@@ -516,7 +682,6 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
             });
         });
 
-        // Link Configurations
         const linkUnderline = config['link-underline'];
         const linkColor = config['link-color'];
 
@@ -530,7 +695,6 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
             }
         });
 
-        // Margins Configuration
         const pTop = config['margin-top'] || config['margin'] || '15mm';
         const pRight = config['margin-right'] || config['margin'] || '15mm';
         const pBottom = config['margin-bottom'] || config['margin'] || '15mm';
@@ -544,20 +708,17 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
         document.documentElement.style.setProperty('--print-margin', `${pTop} ${pRight} ${pBottom} ${pLeft}`);
     }
 
-    // Live Render Trigger
     editor.addEventListener('input', () => {
         saveStatus.textContent = 'Saving...';
         renderResume();
     });
 
-    // Theme Swap Handler
     themeSelect.addEventListener('change', (e) => {
         preview.className = '';
         preview.classList.add(e.target.value);
         renderResume();
     });
 
-    // Insert Default Frontmatter Config
     btnInsertConfig.addEventListener('click', () => {
         const currentText = editor.value;
         const fmMatch = currentText.match(/^---\r?\n([\s\S]*?)\r?\n---/);
@@ -571,7 +732,6 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
         renderResume();
     });
 
-    // File Upload
     fileUpload.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -583,7 +743,6 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
         reader.readAsText(file);
     });
 
-    // Export .md File
     btnExport.addEventListener('click', () => {
         const blob = new Blob([editor.value], { type: 'text/markdown;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
@@ -595,7 +754,6 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
         document.body.removeChild(link);
     });
 
-    // Print to PDF
     btnPrint.addEventListener('click', () => {
         window.print();
     });
