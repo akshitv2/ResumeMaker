@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown to Resume Converter</title>
+    <!-- Load marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Load html2pdf.js for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        /* UI Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .controls {
+            background: #fff;
+            padding: 15px 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #004494;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        /* Resume A4 Container Styling */
+        #resume-wrapper {
+            background-color: white;
+            width: 210mm;
+            min-height: 297mm;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-sizing: border-box;
+            padding: 20mm;
+        }
+
+        /* Resume Typography & Spacing */
+        #resume-content {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #000;
+        }
+        #resume-content h1 {
+            font-size: 24pt;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-weight: normal;
+        }
+        #resume-content h2 {
+            font-size: 14pt;
+            border-bottom: 1px solid #000;
+            padding-bottom: 2px;
+            margin-top: 15pt;
+            margin-bottom: 8pt;
+            text-transform: uppercase;
+        }
+        #resume-content h3 {
+            font-size: 12pt;
+            margin-top: 10pt;
+            margin-bottom: 2pt;
+        }
+        #resume-content p {
+            margin-top: 0;
+            margin-bottom: 8pt;
+        }
+        #resume-content ul {
+            margin-top: 2pt;
+            margin-bottom: 8pt;
+            padding-left: 20pt;
+        }
+        #resume-content li {
+            margin-bottom: 3pt;
+        }
+        #resume-content strong {
+            font-weight: bold;
+        }
+        #resume-content a {
+            color: #000;
+            text-decoration: none;
+        }
+
+        /* Print formatting */
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .controls {
+                display: none;
+            }
+            #resume-wrapper {
+                box-shadow: none;
+                width: 100%;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <input type="file" id="md-file" accept=".md,text/markdown">
+    <button id="download-btn" disabled>Download as PDF</button>
+</div>
+
+<div id="resume-wrapper">
+    <div id="resume-content">
+        <h1 style="color: #888; text-align: center; margin-top: 50px;">Upload a Markdown file or place resume.md in directory</h1>
+    </div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('md-file');
+    const downloadBtn = document.getElementById('download-btn');
+    const resumeContent = document.getElementById('resume-content');
+    const resumeWrapper = document.getElementById('resume-wrapper');
+
+    function renderMarkdown(text) {
+        resumeContent.innerHTML = marked.parse(text);
+        downloadBtn.disabled = false;
+    }
+
+    // Auto-load resume.md if it exists in the same directory
+    window.addEventListener('DOMContentLoaded', () => {
+        fetch('resume.md')
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                }
+                throw new Error('resume.md not found');
+            })
+            .then(text => renderMarkdown(text))
+            .catch(() => {
+                // Silently fail if resume.md is not found, keep initial upload prompt
+            });
+    });
+
+    // Handle manual file upload and parsing
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            renderMarkdown(e.target.result);
+        };
+        reader.readAsText(file);
+    });
+
+    // Handle PDF generation
+    downloadBtn.addEventListener('click', function() {
+        const opt = {
+            margin:       0,
+            filename:     'resume.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(resumeWrapper).save();
+    });
+</script>
+
+</body>
+</html>
