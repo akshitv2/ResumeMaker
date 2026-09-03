@@ -10,9 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* ==========================================
-           1. MS WORD APP LAYOUT & TOOLBAR STYLES
-           ========================================== */
         :root {
             --word-blue: #2b579a;
             --word-blue-dark: #1f3d6d;
@@ -25,7 +22,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; background: #e6e6e6; }
 
-        /* Word Header Bar */
         .word-header {
             background-color: var(--word-blue);
             color: white;
@@ -39,7 +35,6 @@
         }
         .word-header .title { font-weight: 600; display: flex; align-items: center; gap: 8px; }
 
-        /* Word Ribbon Toolbar */
         .word-ribbon {
             background-color: var(--word-ribbon-bg);
             border-bottom: 1px solid var(--word-border);
@@ -99,7 +94,6 @@
         }
         button.btn-primary:hover { background-color: var(--word-blue-dark); }
 
-        /* Main Workspace Dual-Pane */
         .workspace {
             display: flex;
             flex: 1;
@@ -107,7 +101,6 @@
             overflow: hidden;
         }
 
-        /* Left Pane - Markdown Editor */
         .editor-pane {
             width: 45%;
             background: var(--editor-bg);
@@ -142,7 +135,6 @@
             tab-size: 2;
         }
 
-        /* Right Pane - Preview Area */
         .preview-pane {
             width: 55%;
             background: #e6e6e6;
@@ -153,7 +145,7 @@
             position: relative;
         }
 
-        /* A4 Container */
+        /* A4 Container & Always-On Precise Page Break Overlay */
         #resume-preview {
             background: white;
             width: 210mm;
@@ -164,24 +156,20 @@
             transition: all 0.2s ease;
         }
 
-        /* Page Break Overlay Line */
-        .show-page-breaks#resume-preview::after {
-            content: "A4 PAGE BREAK (297mm)";
+        /* Repeated exact A4 297mm cutoff lines */
+        #resume-preview::before {
+            content: "";
             position: absolute;
-            top: 297mm;
+            top: 0;
             left: 0;
             right: 0;
-            border-top: 2px dashed #ff4d4d;
-            color: #ff4d4d;
-            font-family: sans-serif;
-            font-size: 10px;
-            font-weight: bold;
-            text-align: right;
-            padding-right: 10px;
+            bottom: 0;
             pointer-events: none;
+            background-image: linear-gradient(to bottom, transparent calc(297mm - 1px), #ff4d4d calc(297mm - 1px), #ff4d4d 297mm);
+            background-size: 100% 297mm;
+            z-index: 100;
         }
 
-        /* Helper Flex Layout Tag Styles */
         .flex-row {
             display: flex !important;
             justify-content: space-between !important;
@@ -191,11 +179,7 @@
         .flex-left { text-align: left; }
         .flex-right { text-align: right; }
 
-        /* ==========================================
-           2. MODULAR RESUME THEMES
-           ========================================== */
-
-        /* Theme 1: Formal Classic */
+        /* Themes */
         .theme-formal {
             font-family: 'Georgia', 'Times New Roman', serif;
             font-size: 10.5pt;
@@ -208,7 +192,6 @@
         .theme-formal h3 { font-size: 11pt; margin-top: 8px; }
         .theme-formal ul { padding-left: 18px; margin-bottom: 8px; }
 
-        /* Theme 2: Modern Minimal */
         .theme-modern {
             font-family: 'Segoe UI', Arial, sans-serif;
             font-size: 10pt;
@@ -221,7 +204,6 @@
         .theme-modern h3 { font-size: 10.5pt; color: #2d3748; margin-top: 6px; }
         .theme-modern ul { padding-left: 16px; margin-bottom: 6px; }
 
-        /* Theme 3: Tech / Developer */
         .theme-tech {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             font-size: 9.5pt;
@@ -234,7 +216,6 @@
         .theme-tech h3 { font-size: 10pt; margin-top: 6px; }
         .theme-tech ul { padding-left: 16px; margin-bottom: 6px; }
 
-        /* Theme 4: Executive Navy */
         .theme-executive {
             font-family: 'Garamond', 'Hoefler Text', serif;
             font-size: 11pt;
@@ -247,7 +228,6 @@
         .theme-executive h3 { font-size: 11pt; margin-top: 8px; font-style: italic; }
         .theme-executive ul { padding-left: 18px; margin-bottom: 8px; }
 
-        /* Theme 5: Compact One-Page */
         .theme-compact {
             font-family: Arial, Helvetica, sans-serif;
             font-size: 9pt;
@@ -261,13 +241,9 @@
         .theme-compact p, .theme-compact ul { margin-bottom: 4px; }
         .theme-compact ul { padding-left: 14px; }
 
-        /* Common MD Formatting Adjustments inside Preview */
         #resume-preview p { margin-bottom: 6px; }
         #resume-preview a { color: inherit; text-decoration: none; }
 
-        /* ==========================================
-           3. NATIVE PDF PRINT OPTIMIZATION
-           ========================================== */
         @media print {
             body, html { background: white !important; height: auto !important; overflow: visible !important; }
             .word-header, .word-ribbon, .editor-pane, .pane-header { display: none !important; }
@@ -280,7 +256,7 @@
                 margin: 0 !important;
                 padding: var(--print-margin, 15mm) !important;
             }
-            .show-page-breaks#resume-preview::after { display: none !important; }
+            #resume-preview::before { display: none !important; }
             @page { size: A4; margin: 0; }
         }
     </style>
@@ -293,17 +269,6 @@
 </div>
 
 <div class="word-ribbon">
-    <div class="ribbon-group">
-        <div class="control-item">
-            <span class="ribbon-label">Rendering</span>
-            <select id="render-mode">
-                <option value="live">Live Render</option>
-                <option value="manual">Click to Render</option>
-            </select>
-        </div>
-        <button id="btn-render" class="btn-primary" style="display:none; margin-top:14px;"><i class="fa-solid fa-play"></i> Render</button>
-    </div>
-
     <div class="ribbon-group">
         <div class="control-item">
             <span class="ribbon-label">Resume Theme</span>
@@ -319,8 +284,8 @@
 
     <div class="ribbon-group">
         <div class="control-item">
-            <span class="ribbon-label">View Tools</span>
-            <button id="btn-toggle-pagebreak"><i class="fa-solid fa-page-break"></i> Toggle A4 Page Break</button>
+            <span class="ribbon-label">Configuration</span>
+            <button id="btn-insert-config" class="btn-primary"><i class="fa-solid fa-sliders"></i> Insert Default Config</button>
         </div>
     </div>
 
@@ -360,15 +325,55 @@
 </div>
 
 <script>
-    // Default Fallback Resume Template
-    const DEFAULT_RESUME = `---
-font-family: "Segoe UI", Arial, sans-serif
+    const DEFAULT_CONFIG_BLOCK = `<!--
+font-family: 'Georgia'
 font-size: 10pt
-margin: 15mm
 line-height: 1.4
----
+text-color: "#222222"
+margin-top: 15mm
+margin-bottom: 15mm
+margin-left: 15mm
+margin-right: 15mm
+link-underline: true
+link-color: "#0366d6"
 
-# ALEX MORGAN
+h1:
+  font-size: 22pt
+  align: center
+  uppercase: true
+  underline-distance: 2px
+
+h2:
+  font-size: 11pt
+  align: left
+  uppercase: true
+  underline-distance: 4px
+
+h3:
+  font-size: 10.5pt
+  align: left
+  uppercase: false
+  underline-distance: 2px
+
+h4:
+  font-size: 10pt
+  align: left
+  uppercase: false
+
+h5:
+  font-size: 9.5pt
+  align: left
+  uppercase: false
+
+h6:
+  font-size: 9pt
+  align: left
+  uppercase: false
+-->
+
+`;
+
+    const DEFAULT_RESUME = DEFAULT_CONFIG_BLOCK + `# ALEX MORGAN
 <left>Seattle, WA | alex.morgan@email.com | (555) 019-2834</left><right>linkedin.com/in/alexmorgan</right>
 
 ---
@@ -397,19 +402,15 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
 <left>**B.S. in Computer Science** — University of Washington</left><right>2014 – 2018</right>
 `;
 
-    // DOM Elements
     const editor = document.getElementById('editor');
     const preview = document.getElementById('resume-preview');
-    const renderModeSelect = document.getElementById('render-mode');
-    const btnRender = document.getElementById('btn-render');
     const themeSelect = document.getElementById('theme-select');
-    const btnTogglePagebreak = document.getElementById('btn-toggle-pagebreak');
     const fileUpload = document.getElementById('file-upload');
     const btnExport = document.getElementById('btn-export');
     const btnPrint = document.getElementById('btn-print');
+    const btnInsertConfig = document.getElementById('btn-insert-config');
     const saveStatus = document.getElementById('save-status');
 
-    // Init Logic
     window.addEventListener('DOMContentLoaded', async () => {
         const cached = localStorage.getItem('resume_md_content');
         if (cached) {
@@ -429,12 +430,10 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
         renderResume();
     });
 
-    // Custom Preprocessor for Frontmatter and Tags
     function parseFrontmatterAndConfig(text) {
         let config = {};
         let mdContent = text;
 
-        // 1. Check YAML Frontmatter
         const fmMatch = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
         if (fmMatch) {
             try {
@@ -442,12 +441,12 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
                 mdContent = text.replace(/^---\r?\n([\s\S]*?)\r?\n---/, '');
             } catch (e) { console.error('YAML Frontmatter Parsing Error', e); }
         } else {
-            // 2. Check HTML Comment Configuration block
             const commentMatch = text.match(/^<!--\r?\n([\s\S]*?)\r?\n-->/);
             if (commentMatch) {
                 try {
                     config = jsyaml.load(commentMatch[1]) || {};
                     mdContent = text.replace(/^<!--\r?\n([\s\S]*?)\r?\n-->/, '');
+                    console.log(config);
                 } catch (e) { console.error('Comment Config Parsing Error', e); }
             }
         }
@@ -456,100 +455,120 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
     }
 
     function preprocessCustomLayoutTags(text) {
-        // Use <span> instead of <div> so Marked.js continues to parse markdown inside them
         let processed = text.replace(/<left>([\s\S]*?)<\/left>\s*<right>([\s\S]*?)<\/right>/gi, '<span class="flex-row"><span class="flex-left">$1</span><span class="flex-right">$2</span></span>');
         processed = processed.replace(/<left>([\s\S]*?)<\/left>/gi, '<span class="flex-left">$1</span>');
         processed = processed.replace(/<right>([\s\S]*?)<\/right>/gi, '<span class="flex-right">$1</span>');
         return processed;
     }
 
-    // Main Render Routine
+    function getHeadingConfig(config, tag, prop) {
+        if (config[tag] && typeof config[tag] === 'object') {
+            if (config[tag][prop] !== undefined) return config[tag][prop];
+        }
+        const flatKey = `${tag}-${prop}`;
+        if (config[flatKey] !== undefined) return config[flatKey];
+        return undefined;
+    }
+
     function renderResume() {
         const rawText = editor.value;
 
-        // Auto-save to LocalStorage
         localStorage.setItem('resume_md_content', rawText);
         saveStatus.textContent = 'Saved';
-        setTimeout(() => { saveStatus.textContent = 'Saved'; }, 1000);
 
         const { config, mdContent } = parseFrontmatterAndConfig(rawText);
         const preprocessedMd = preprocessCustomLayoutTags(mdContent);
 
-        // Render Markdown
         preview.innerHTML = marked.parse(preprocessedMd);
 
-        for (let heading of ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']) {
-            if (config[heading + '-font-size']) {
-                preview.querySelectorAll(heading).forEach(h => {
-                    h.style.fontSize = config[heading + '-font-size'];
-                });
+        // General Font & Text Styles
+        preview.style.fontFamily = config['font-family'] || '';
+        preview.style.fontSize = config['font-size'] || '';
+        preview.style.lineHeight = config['line-height'] || '';
+        preview.style.color = config['text-color'] || '';
+
+        // Heading Configurations (h1 through h6)
+        ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(tag => {
+            const elements = preview.querySelectorAll(tag);
+            if (!elements.length) return;
+
+            const fontSize = getHeadingConfig(config, tag, 'font-size');
+            const color = getHeadingConfig(config, tag, 'color');
+            const align = getHeadingConfig(config, tag, 'align');
+            const uppercase = getHeadingConfig(config, tag, 'uppercase');
+            const underline = getHeadingConfig(config, tag, 'underline');
+            const underlineDist = getHeadingConfig(config, tag, 'underline-distance');
+
+            elements.forEach(el => {
+                if (fontSize !== undefined) el.style.fontSize = fontSize;
+                if (color !== undefined) el.style.color = color;
+                if (align !== undefined) el.style.textAlign = align;
+                if (uppercase !== undefined) {
+                    el.style.textTransform = (uppercase === true || uppercase === 'true') ? 'uppercase' : 'none';
+                }
+                if (underline !== undefined) {
+                    const isUnderlined = (underline === true || underline === 'true');
+                    el.style.textDecoration = isUnderlined ? 'underline' : 'none';
+                    if (isUnderlined && underlineDist !== undefined) {
+                        el.style.textUnderlineOffset = typeof underlineDist === 'number' ? `${underlineDist}px` : underlineDist;
+                    }
+                }
+            });
+        });
+
+        // Link Configurations
+        const linkUnderline = config['link-underline'];
+        const linkColor = config['link-color'];
+
+        preview.querySelectorAll('a').forEach(a => {
+            if (linkUnderline !== undefined) {
+                const isUnderlining = (linkUnderline === true || linkUnderline === 'true');
+                a.style.textDecoration = isUnderlining ? 'underline' : 'none';
             }
-        }
+            if (linkColor !== undefined) {
+                a.style.color = linkColor;
+            }
+        });
 
-        // Apply Frontmatter Dynamic Inline Configs
-        if (config['font-family']) preview.style.fontFamily = config['font-family'];
-        else preview.style.fontFamily = '';
-
-        if (config['font-size']) preview.style.fontSize = config['font-size'];
-        else preview.style.fontSize = '';
-
-        if (config['line-height']) preview.style.lineHeight = config['line-height'];
-        else preview.style.lineHeight = '';
-
-        // if (config['resume-margin']) {
-        //     preview.style.padding = config['resume-margin'];
-        //     document.documentElement.style.setProperty('--print-margin', config['resume-margin']);
-        // } else {
-        //     preview.style.padding = '';
-        //     document.documentElement.style.setProperty('--print-margin', '15mm');
-        // }
-
-        // Apply Margin Configs (Supports directional overrides and general shorthand)
-        preview.style.paddingTop = config['margin-top'] || config['margin'] || '';
-        preview.style.paddingRight = config['margin-right'] || config['margin'] || '';
-        preview.style.paddingBottom = config['margin-bottom'] || config['margin'] || '';
-        preview.style.paddingLeft = config['margin-left'] || config['margin'] || '';
-
-        // Calculate CSS variable for PDF printing
+        // Margins Configuration
         const pTop = config['margin-top'] || config['margin'] || '15mm';
         const pRight = config['margin-right'] || config['margin'] || '15mm';
         const pBottom = config['margin-bottom'] || config['margin'] || '15mm';
         const pLeft = config['margin-left'] || config['margin'] || '15mm';
+
+        preview.style.paddingTop = pTop;
+        preview.style.paddingRight = pRight;
+        preview.style.paddingBottom = pBottom;
+        preview.style.paddingLeft = pLeft;
+
         document.documentElement.style.setProperty('--print-margin', `${pTop} ${pRight} ${pBottom} ${pLeft}`);
     }
 
-    // Event Listeners
+    // Live Render Trigger
     editor.addEventListener('input', () => {
         saveStatus.textContent = 'Saving...';
-        if (renderModeSelect.value === 'live') {
-            renderResume();
-        }
+        renderResume();
     });
-
-    renderModeSelect.addEventListener('change', (e) => {
-        if (e.target.value === 'manual') {
-            btnRender.style.display = 'inline-flex';
-        } else {
-            btnRender.style.display = 'none';
-            renderResume();
-        }
-    });
-
-    btnRender.addEventListener('click', renderResume);
 
     // Theme Swap Handler
     themeSelect.addEventListener('change', (e) => {
-        preview.className = ''; // Clear existing themes
+        preview.className = '';
         preview.classList.add(e.target.value);
-        if (btnTogglePagebreak.classList.contains('active')) {
-            preview.classList.add('show-page-breaks');
-        }
+        renderResume();
     });
 
-    // Page Break Overlay Toggle
-    btnTogglePagebreak.addEventListener('click', () => {
-        btnTogglePagebreak.classList.toggle('active');
-        preview.classList.toggle('show-page-breaks');
+    // Insert Default Frontmatter Config
+    btnInsertConfig.addEventListener('click', () => {
+        const currentText = editor.value;
+        const fmMatch = currentText.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+        if (fmMatch) {
+            if (confirm("Frontmatter configuration already exists. Replace it with default configuration?")) {
+                editor.value = currentText.replace(/^---\r?\n([\s\S]*?)\r?\n---/, DEFAULT_CONFIG_BLOCK.trim());
+            }
+        } else {
+            editor.value = DEFAULT_CONFIG_BLOCK + currentText;
+        }
+        renderResume();
     });
 
     // File Upload
