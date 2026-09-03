@@ -3,8 +3,8 @@
 **Software Engineer**  
 
 <left>San Francisco, USA </left> <right> alex.johnson@example.com   </right>  
-<hr>
-[LinkedIn](https://www.linkedin.com/in/alexjohnson) · [GitHub](https://github.com/alexjohnson)
+
+<left>[LinkedIn](https://www.linkedin.com/in/alexjohnson) </left> <right> [GitHub](https://github.com/alexjohnson) </right>
 
 ## Professional Summary
 

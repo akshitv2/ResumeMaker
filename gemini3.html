@@ -4,30 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Markdown to Resume Converter</title>
-    <!-- Marked.js for Markdown parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        /* UI Controls Styling */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+        /* Layout */
+        body, html {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+        .left-pane {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
-        }
-        .controls {
-            background: #fff;
-            padding: 15px 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            display: flex;
+            background-color: #2d2d2d;
+            padding: 20px;
+            box-sizing: border-box;
             gap: 15px;
-            align-items: center;
+            border-right: 2px solid #000;
         }
-        button {
+        .right-pane {
+            flex: 1;
+            background-color: #f0f0f0;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+            /* Flex centering removed to prevent overflow clipping */
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            background: #3d3d3d;
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+        }
+        button, input[type="file"]::file-selector-button {
             padding: 8px 16px;
             background-color: #0056b3;
             color: white;
@@ -36,12 +57,11 @@
             cursor: pointer;
             font-size: 14px;
         }
-        button:hover {
+        button:hover, input[type="file"]::file-selector-button:hover {
             background-color: #004494;
         }
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
+        input[type="file"] {
+            color: white;
         }
         .toggle-label {
             font-size: 14px;
@@ -52,8 +72,25 @@
             user-select: none;
         }
 
-        /* Resume Container Styling with CSS Variables */
+        /* Editor */
+        #editor {
+            flex-grow: 1;
+            width: 100%;
+            resize: none;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            padding: 15px;
+            box-sizing: border-box;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        /* Resume Container */
         #resume-wrapper {
+            margin: 0 auto; /* Centers wrapper horizontally */
+
             --resume-width: 210mm;
             --hr-margin: 10px;
             --font-base: 11pt;
@@ -76,7 +113,7 @@
             color: #000;
         }
 
-        /* Page Break Visualizer (A4 height repeating red line) */
+        /* Page Break Visualizer */
         #resume-wrapper.show-page-breaks {
             background-image: linear-gradient(
                     to bottom,
@@ -88,52 +125,15 @@
         }
 
         /* Typography & Layout */
-        #resume-content h1 {
-            font-size: var(--font-h1);
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 5px;
-            font-weight: normal;
-        }
-        #resume-content h2 {
-            font-size: var(--font-h2);
-            border-bottom: 1px solid #000;
-            padding-bottom: 2px;
-            margin-top: 15pt;
-            margin-bottom: 8pt;
-            text-transform: uppercase;
-        }
-        #resume-content h3 {
-            font-size: var(--font-h3);
-            margin-top: 10pt;
-            margin-bottom: 2pt;
-        }
-        #resume-content p {
-            margin-top: 0;
-            margin-bottom: 8pt;
-        }
-        #resume-content ul {
-            margin-top: 2pt;
-            margin-bottom: 8pt;
-            padding-left: 20pt;
-        }
-        #resume-content li {
-            margin-bottom: 3pt;
-        }
-        #resume-content hr {
-            border: none;
-            border-top: 1px solid #000;
-            margin-top: var(--hr-margin);
-            margin-bottom: var(--hr-margin);
-        }
+        #resume-content h1 { font-size: var(--font-h1); text-align: center; margin-top: 0; margin-bottom: 5px; font-weight: normal; }
+        #resume-content h2 { font-size: var(--font-h2); border-bottom: 1px solid #000; padding-bottom: 2px; margin-top: 15pt; margin-bottom: 8pt; text-transform: uppercase; }
+        #resume-content h3 { font-size: var(--font-h3); margin-top: 10pt; margin-bottom: 2pt; }
+        #resume-content p { margin-top: 0; margin-bottom: 8pt; }
+        #resume-content ul { margin-top: 2pt; margin-bottom: 8pt; padding-left: 20pt; }
+        #resume-content li { margin-bottom: 3pt; }
+        #resume-content hr { border: none; border-top: 1px solid #000; margin-top: var(--hr-margin); margin-bottom: var(--hr-margin); }
+        #resume-content a { color: #000; text-decoration: underline; }
 
-        /* Links underlined by default */
-        #resume-content a {
-            color: #000;
-            text-decoration: underline;
-        }
-
-        /* Flex row for <left> and <right> tags on the same line */
         .flex-row {
             display: flex;
             justify-content: space-between;
@@ -142,54 +142,74 @@
             margin-bottom: 4px;
         }
 
-        /* Print setup for selectable text PDF generation */
+        /* Print setup */
         @media print {
             @page {
                 size: A4 portrait;
                 margin: 0;
             }
-            body {
-                background: none;
-                padding: 0;
-                margin: 0;
-            }
-            .controls {
+            .left-pane {
                 display: none !important;
+            }
+            .right-pane {
+                display: block !important;
+                padding: 0 !important;
+                overflow: visible !important;
+                background: none !important;
             }
             #resume-wrapper {
                 box-shadow: none !important;
                 width: 100% !important;
                 min-height: auto !important;
+                margin: 0 !important;
                 padding: var(--page-padding) !important;
-                background-image: none !important; /* Hide visual page break indicator on print */
+                background-image: none !important;
+            }
+            .right-pane .controls {
+                display: none !important;
             }
         }
     </style>
 </head>
 <body>
 
-<div class="controls">
-    <input type="file" id="md-file" accept=".md,text/markdown">
-    <label class="toggle-label">
-        <input type="checkbox" id="page-break-toggle" checked> Show Page Breaks
-    </label>
-    <button id="download-btn" disabled>Save as PDF</button>
-</div>
+<div class="container">
+    <!-- Left Pane: Editor -->
+    <div class="left-pane">
+        <div class="controls">
+            <input type="file" id="md-file" accept=".md,text/markdown">
+            <button id="render-btn">Render</button>
+            <button id="download-md-btn">Download MD</button>
+            <button id="download-pdf-btn">Save as PDF</button>
+            <label class="toggle-label">
+                <input type="checkbox" id="page-break-toggle" checked> Show Page Breaks
+            </label>
+        </div>
+        <textarea id="editor" placeholder="Write your markdown here or upload a file..."></textarea>
+    </div>
 
-<div id="resume-wrapper" class="show-page-breaks">
-    <div id="resume-content">
-        <h1 style="color: #888; text-align: center; margin-top: 50px;">Upload a Markdown file or place resume.md in directory</h1>
+    <!-- Right Pane: Output -->
+    <div class="right-pane">
+        <div id="resume-wrapper" class="show-page-breaks">
+            <div id="resume-content">
+                <h1 style="color: #888; text-align: center; margin-top: 50px;">Rendered Output Will Appear Here</h1>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
     const fileInput = document.getElementById('md-file');
-    const downloadBtn = document.getElementById('download-btn');
+    const editor = document.getElementById('editor');
+    const renderBtn = document.getElementById('render-btn');
+    const downloadMdBtn = document.getElementById('download-md-btn');
+    const downloadPdfBtn = document.getElementById('download-pdf-btn');
     const pageBreakToggle = document.getElementById('page-break-toggle');
     const resumeContent = document.getElementById('resume-content');
     const resumeWrapper = document.getElementById('resume-wrapper');
 
-    // Default configuration
+    const STORAGE_KEY = 'resume_md_content';
+
     const defaultConfig = {
         width: '210mm',
         hrMargin: '10px',
@@ -211,12 +231,10 @@
         }
     });
 
-    // Extract frontmatter config at the top of the file if present
     function parseConfigAndMarkdown(text) {
         const config = { ...defaultConfig };
         let cleanText = text;
 
-        // Match frontmatter block (--- ... --- or <!-- ... -->)
         const frontmatterMatch = text.match(/^---\s*\n([\s\S]*?)\n---\s*\n/) || text.match(/^<!--\s*([\s\S]*?)\s*-->/);
 
         if (frontmatterMatch) {
@@ -241,11 +259,9 @@
                 }
             });
         }
-
         return { config, markdown: cleanText };
     }
 
-    // Pre-process <left> and <right> tags into flexbox rows
     function preprocessLeftRight(text) {
         return text.replace(
             /<left>([\s\S]*?)<\/left>\s*<right>([\s\S]*?)<\/right>/gi,
@@ -269,34 +285,63 @@
         resumeWrapper.style.setProperty('--page-padding', config.pagePadding);
     }
 
-    function renderMarkdown(rawText) {
+    function executeRender() {
+        const rawText = editor.value;
+        localStorage.setItem(STORAGE_KEY, rawText); // Save progress
         const { config, markdown } = parseConfigAndMarkdown(rawText);
         applyStyles(config);
         const processedMarkdown = preprocessLeftRight(markdown);
         resumeContent.innerHTML = marked.parse(processedMarkdown);
-        downloadBtn.disabled = false;
     }
 
-    // Auto-load resume.md if present
+    // Render Button Logic
+    renderBtn.addEventListener('click', executeRender);
+
+    // Initial Load Logic
     window.addEventListener('DOMContentLoaded', () => {
-        fetch('resume.md')
-            .then(response => response.ok ? response.text() : Promise.reject())
-            .then(text => renderMarkdown(text))
-            .catch(() => {});
+        const savedData = localStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+            editor.value = savedData;
+            executeRender();
+        } else {
+            fetch('resume.md')
+                .then(response => response.ok ? response.text() : Promise.reject())
+                .then(text => {
+                    editor.value = text;
+                    executeRender();
+                })
+                .catch(() => {});
+        }
     });
 
-    // Handle manual upload
+    // Handle manual upload to editor
     fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = (e) => renderMarkdown(e.target.result);
+        reader.onload = (e) => {
+            editor.value = e.target.result;
+            executeRender();
+        };
         reader.readAsText(file);
     });
 
+    // Download Markdown File
+    downloadMdBtn.addEventListener('click', () => {
+        const blob = new Blob([editor.value], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'resume.md';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+
     // Trigger native browser PDF printing
-    downloadBtn.addEventListener('click', () => {
+    downloadPdfBtn.addEventListener('click', () => {
         window.print();
     });
 </script>
