@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown URL Encoder</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 24px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f5f5f5;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        button,
+        input[type="file"] {
+            font: inherit;
+        }
+
+        button {
+            padding: 9px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #eee;
+        }
+
+        .file-label {
+            display: inline-flex;
+            align-items: center;
+            padding: 9px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .file-label:hover {
+            background: #eee;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .panels {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 500px;
+            padding: 14px;
+            resize: vertical;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: white;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        #output {
+            background: #fafafa;
+        }
+
+        .status {
+            margin-top: 10px;
+            color: #666;
+            font-size: 13px;
+        }
+
+        @media (max-width: 800px) {
+            .panels {
+                grid-template-columns: 1fr;
+            }
+
+            textarea {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h1>Markdown URL Encoder</h1>
+
+    <div class="toolbar">
+        <label class="file-label">
+            Choose Markdown File
+            <input type="file" id="fileInput" accept=".md,.markdown,text/markdown,text/plain">
+        </label>
+
+        <button id="encodeButton">Encode →</button>
+        <button id="copyButton">Copy Output</button>
+        <button id="downloadButton">Download Output</button>
+        <button id="clearButton">Clear</button>
+    </div>
+
+    <div class="panels">
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Markdown</h2>
+            </div>
+
+            <textarea
+                    id="input"
+                    placeholder="Paste Markdown here or choose a .md file..."
+            ></textarea>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h2>URL Encoded</h2>
+            </div>
+
+            <textarea
+                    id="output"
+                    readonly
+                    placeholder="Encoded output will appear here..."
+            ></textarea>
+        </div>
+    </div>
+
+    <div class="status" id="status"></div>
+</div>
+
+<script>
+    const fileInput = document.getElementById("fileInput");
+    const input = document.getElementById("input");
+    const output = document.getElementById("output");
+    const encodeButton = document.getElementById("encodeButton");
+    const copyButton = document.getElementById("copyButton");
+    const downloadButton = document.getElementById("downloadButton");
+    const clearButton = document.getElementById("clearButton");
+    const status = document.getElementById("status");
+
+    // Read Markdown file
+    fileInput.addEventListener("change", async (event) => {
+        const file = event.target.files[0];
+
+        if (!file) return;
+
+        try {
+            input.value = await file.text();
+            status.textContent = `${file.name} loaded (${file.size} bytes)`;
+
+            encodeMarkdown();
+        } catch (error) {
+            status.textContent = "Failed to read file.";
+            console.error(error);
+        }
+    });
+
+    // URL encode the Markdown
+    function encodeMarkdown() {
+        const markdown = input.value;
+
+        try {
+            output.value = encodeURIComponent(markdown);
+
+            status.textContent =
+                `${markdown.length} characters → ${output.value.length} encoded characters`;
+        } catch (error) {
+            output.value = "";
+            status.textContent = "Encoding failed.";
+            console.error(error);
+        }
+    }
+
+    encodeButton.addEventListener("click", encodeMarkdown);
+
+    // Automatically encode while typing/pasting
+    input.addEventListener("input", encodeMarkdown);
+
+    // Copy encoded output
+    copyButton.addEventListener("click", async () => {
+        if (!output.value) {
+            status.textContent = "Nothing to copy.";
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(output.value);
+            status.textContent = "Encoded output copied to clipboard.";
+        } catch (error) {
+            // Fallback for older browsers
+            output.select();
+            document.execCommand("copy");
+            status.textContent = "Encoded output copied to clipboard.";
+        }
+    });
+
+    // Download encoded output
+    downloadButton.addEventListener("click", () => {
+        if (!output.value) {
+            status.textContent = "Nothing to download.";
+            return;
+        }
+
+        const blob = new Blob([output.value], {
+            type: "text/plain;charset=utf-8"
+        });
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = "encoded.txt";
+        link.click();
+
+        URL.revokeObjectURL(url);
+
+        status.textContent = "Encoded output downloaded.";
+    });
+
+    // Clear everything
+    clearButton.addEventListener("click", () => {
+        input.value = "";
+        output.value = "";
+        fileInput.value = "";
+        status.textContent = "";
+    });
+</script>
+</body>
+</html>

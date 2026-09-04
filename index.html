@@ -177,10 +177,6 @@
         .flex-left { text-align: left; }
         .flex-right { text-align: right; }
 
-        /* ==========================================
-           BASE RESUME THEMES
-           ========================================== */
-
         .theme-formal {
             font-family: 'Georgia', 'Times New Roman', serif;
             font-size: 10.5pt;
@@ -242,10 +238,6 @@
         .theme-compact p, .theme-compact ul { margin-bottom: 4px; }
         .theme-compact ul { padding-left: 14px; }
 
-        /* ==========================================
-           5 CREATIVE THEMES
-           ========================================== */
-
         .theme-creative-terracotta {
             font-family: 'Trebuchet MS', 'Lucida Sans Unicode', sans-serif;
             font-size: 10pt;
@@ -305,10 +297,6 @@
         .theme-creative-nordic h2 { font-size: 10pt; color: #0f766e; font-weight: 600; text-transform: uppercase; letter-spacing: 2.5px; border-bottom: 1px solid #99f6e4; padding-bottom: 3px; margin-top: 14px; margin-bottom: 8px; }
         .theme-creative-nordic h3 { font-size: 9.5pt; color: #115e59; margin-top: 6px; }
         .theme-creative-nordic ul { padding-left: 16px; margin-bottom: 6px; }
-
-        /* ==========================================
-           5 SIMPLE / FORMAL VARIATION THEMES
-           ========================================== */
 
         .theme-formal-serif {
             font-family: 'Times New Roman', Times, serif;
@@ -370,11 +358,6 @@
         .theme-formal-corporate h3 { font-size: 10.5pt; color: #1e293b; margin-top: 6px; font-style: italic; }
         .theme-formal-corporate ul { padding-left: 18px; margin-bottom: 6px; }
 
-        /* ==========================================
-           3 SUPER CREATIVE THEMES
-           ========================================== */
-
-        /* Super Creative 1: Crazy Splash Lines & Accents */
         .theme-super-splash {
             font-family: 'Segoe UI', system-ui, sans-serif;
             font-size: 9.5pt;
@@ -434,7 +417,6 @@
         .theme-super-splash h3 { font-size: 10pt; color: #6d28d9; margin-top: 6px; font-weight: 700; }
         .theme-super-splash ul { padding-left: 16px; margin-bottom: 6px; }
 
-        /* Super Creative 2: Neo-Brutalist Block */
         .theme-super-brutalist {
             font-family: 'Arial Black', Gadget, sans-serif;
             font-size: 9.5pt;
@@ -475,7 +457,6 @@
         }
         .theme-super-brutalist ul { padding-left: 18px; margin-bottom: 6px; list-style-type: square; }
 
-        /* Super Creative 3: Geometric Abstract Multi-Dot */
         .theme-super-abstract {
             font-family: 'Segoe UI', system-ui, sans-serif;
             font-size: 9.5pt;
@@ -541,7 +522,6 @@
                 background: #ffffff !important;
             }
 
-            /* Strip non-ATS printable styling */
             #resume-preview * {
                 color: #000000 !important;
                 background: transparent !important;
@@ -557,7 +537,7 @@
             }
             @page {
                 size: A4;
-                margin: 0; /* Removes browser-generated headers and footers */
+                margin: 0;
             }
         }
     </style>
@@ -741,19 +721,28 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
     const saveStatus = document.getElementById('save-status');
 
     window.addEventListener('DOMContentLoaded', async () => {
-        const cached = localStorage.getItem('resume_md_content');
-        if (cached) {
-            editor.value = cached;
+        const urlParams = new URLSearchParams(window.location.search);
+        const mdParam = urlParams.get('md');
+
+        if (mdParam !== null) {
+            editor.value = mdParam;
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
         } else {
-            try {
-                const res = await fetch('resume.md');
-                if (res.ok) {
-                    editor.value = await res.text();
-                } else {
+            const cached = localStorage.getItem('resume_md_content');
+            if (cached) {
+                editor.value = cached;
+            } else {
+                try {
+                    const res = await fetch('resume.md');
+                    if (res.ok) {
+                        editor.value = await res.text();
+                    } else {
+                        editor.value = DEFAULT_RESUME;
+                    }
+                } catch (e) {
                     editor.value = DEFAULT_RESUME;
                 }
-            } catch (e) {
-                editor.value = DEFAULT_RESUME;
             }
         }
         renderResume();
@@ -783,13 +772,11 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
     }
 
     function preprocessCustomLayoutTags(text) {
-        // 1. Process paired left/right tags first
         let processed = text.replace(
             /<left>([\s\S]*?)<\/left>\s*<right>([\s\S]*?)<\/right>/gi,
             '<div class="flex-row"><div class="flex-left">$1</div><div class="flex-right">$2</div></div>'
         );
 
-        // 2. Process standalone left or right tags if any remain
         processed = processed.replace(/<left>([\s\S]*?)<\/left>/gi, '<div class="flex-left">$1</div>');
         processed = processed.replace(/<right>([\s\S]*?)<\/right>/gi, '<div class="flex-right">$2</div>');
 
@@ -813,15 +800,11 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
 
         const { config, mdContent } = parseFrontmatterAndConfig(rawText);
 
-        // Parse Markdown FIRST so *italics* and **bold** inside tags get converted to HTML <em> and <strong>
         let htmlContent = marked.parse(mdContent);
-
-        // Preprocess custom layout tags AFTER Markdown parsing
         htmlContent = preprocessCustomLayoutTags(htmlContent);
 
         preview.innerHTML = htmlContent;
 
-        // Apply styles from config...
         preview.style.fontFamily = config['font-family'] || '';
         preview.style.fontSize = config['font-size'] || '';
         preview.style.lineHeight = config['line-height'] || '';
