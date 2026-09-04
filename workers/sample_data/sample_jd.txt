@@ -1,0 +1,4 @@
+We are looking for a Backend Developer to design, develop, and maintain scalable server-side applications and APIs.
+The ideal candidate should have experience with Node.js/Python/Java, REST APIs, databases, and cloud platforms.
+You will collaborate with frontend developers and product teams to build reliable and high-performance solutions.
+Strong problem-solving skills, clean coding practices, and knowledge of system design are highly valued.

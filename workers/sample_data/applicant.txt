@@ -1,0 +1,38 @@
+Name: Daniel Carter
+Location: Austin, Texas, USA
+Email: [daniel.carter@example.com](mailto:daniel.carter@example.com)
+Phone: +1 512-555-0147
+LinkedIn: linkedin.com/in/danielcarter-example
+Education: Bachelor of Science in Computer Science
+University: University of Texas at Austin
+Graduation Year: 2018
+Coursework: Data Structures, Algorithms, Operating Systems, Database Systems, Computer Networks
+Skills: Java, Python, Go, SQL, JavaScript
+Backend: REST APIs, Microservices, Distributed Systems, Event-Driven Architecture
+Databases: PostgreSQL, MySQL, Redis, MongoDB
+Cloud: AWS, Docker, Kubernetes
+Tools: Git, Jenkins, GitHub Actions, Linux
+Company: BluePeak Technologies
+Role: Software Engineer
+Location: Austin, Texas
+Employment: July 2018 to August 2021
+Responsibilities: Developed backend services using Java and Spring Boot
+Responsibilities: Designed and maintained REST APIs used by internal and external applications
+Responsibilities: Improved PostgreSQL query performance and database indexing
+Responsibilities: Built asynchronous processing pipelines using Apache Kafka
+Responsibilities: Wrote unit and integration tests and participated in code reviews
+Company: Northstar Commerce
+Role: Senior Backend Engineer
+Location: Seattle, Washington
+Employment: September 2021 to Present
+Responsibilities: Designed scalable microservices using Go and Python
+Responsibilities: Built APIs supporting high-volume e-commerce transactions
+Responsibilities: Migrated several services from virtual machines to Kubernetes on AWS
+Responsibilities: Implemented Redis caching that reduced average API response time
+Responsibilities: Worked with product managers and frontend engineers on new platform features
+Responsibilities: Mentored junior engineers and led backend technical design discussions
+Project: Order Processing Platform
+Project: Built an event-driven order processing system using Go, Kafka, PostgreSQL, and AWS
+Certification: AWS Certified Developer – Associate
+Languages: English
+Interests: Distributed systems, cloud infrastructure, developer tooling
