@@ -90,6 +90,8 @@ export default {
               .page { max-width: 8.5in; margin: 40px auto; background: white; padding: 1in; box-shadow: 0 2px 10px rgba(0,0,0,0.15); border: 1px solid #D2D2D2; }
               .form-group { margin-bottom: 25px; }
               label { display: block; font-weight: 600; margin-bottom: 8px; color: #444; font-size: 14px; }
+              input[type="password"], input[type="text"] { width: 100%; padding: 12px; border: 1px solid #C8C6C4; font-family: 'Segoe UI', Calibri, sans-serif; font-size: 14px; box-sizing: border-box; background-color: #FAFAFA; }
+              input[type="password"]:focus, input[type="text"]:focus { border-color: #2B579A; outline: none; background-color: #FFF; box-shadow: inset 0 0 0 1px #2B579A; }
               textarea { width: 100%; height: 160px; padding: 12px; border: 1px solid #C8C6C4; font-family: 'Segoe UI', Calibri, sans-serif; font-size: 14px; resize: vertical; box-sizing: border-box; background-color: #FAFAFA; }
               textarea:focus { border-color: #2B579A; outline: none; background-color: #FFF; box-shadow: inset 0 0 0 1px #2B579A; }
               .btn { background-color: #2B579A; color: white; border: none; padding: 10px 24px; cursor: pointer; font-size: 14px; border-radius: 2px; font-weight: 600; }
@@ -103,6 +105,10 @@ export default {
           <div class="page">
               <form id="resumeForm">
                   <div class="form-group">
+                      <label for="accessToken">Gemini API Key / Access Token</label>
+                      <input type="password" id="accessToken" placeholder="Enter your Gemini API Key or Token (optional if server key set)">
+                  </div>
+                  <div class="form-group">
                       <label for="applicant">Applicant Details (Experience, Skills, Background)</label>
                       <textarea id="applicant" required placeholder="Paste applicant data here..."></textarea>
                   </div>
@@ -115,6 +121,20 @@ export default {
               </form>
           </div>
           <script>
+              const tokenInput = document.getElementById('accessToken');
+              const applicantInput = document.getElementById('applicant');
+              const jdInput = document.getElementById('jd');
+
+              // Load saved values from localStorage
+              tokenInput.value = localStorage.getItem('resume_access_token') || '';
+              applicantInput.value = localStorage.getItem('resume_applicant') || '';
+              jdInput.value = localStorage.getItem('resume_jd') || '';
+
+              // Persist changes as user types
+              tokenInput.addEventListener('input', () => localStorage.setItem('resume_access_token', tokenInput.value));
+              applicantInput.addEventListener('input', () => localStorage.setItem('resume_applicant', applicantInput.value));
+              jdInput.addEventListener('input', () => localStorage.setItem('resume_jd', jdInput.value));
+
               document.getElementById('resumeForm').addEventListener('submit', async (e) => {
                   e.preventDefault();
                   const btn = document.getElementById('submitBtn');
@@ -125,8 +145,9 @@ export default {
                   status.style.color = '#2B579A';
                   
                   const payload = {
-                      applicant: document.getElementById('applicant').value,
-                      jd: document.getElementById('jd').value
+                      accessToken: tokenInput.value.trim(),
+                      applicant: applicantInput.value,
+                      jd: jdInput.value
                   };
                   
                   try {
@@ -164,11 +185,13 @@ export default {
         // 2. Handle API request
         if (request.method === "POST" && url.pathname === "/generate") {
             try {
-                const { applicant, jd } = await request.json();
+                const { applicant, jd, accessToken } = await request.json();
 
-                if (!env.GEMINI_API_KEY) {
-                    return new Response(JSON.stringify({ error: "GEMINI_API_KEY secret is not set." }), {
-                        status: 500,
+                const apiKey = accessToken || env.GEMINI_API_KEY;
+
+                if (!apiKey) {
+                    return new Response(JSON.stringify({ error: "Gemini API Key / Access Token is required." }), {
+                        status: 400,
                         headers: { "Content-Type": "application/json" }
                     });
                 }
@@ -201,7 +224,7 @@ Target the resume to fit in one A4 page. For size reference the sample_resume pr
                     }]
                 };
 
-                const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${env.GEMINI_API_KEY}`;
+                const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
                 const geminiResponse = await fetch(geminiUrl, {
                     method: "POST",
