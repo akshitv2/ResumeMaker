@@ -256,6 +256,8 @@ Task Instructions:
 5. Quantify achievements with realistic metrics (e.g., percentages, scale, time saved, revenue) across key bullet points to maximize impact.
 6. Strictly format the final output using the layout and Markdown structure provided in the template.
 7. Format the final output to meet ATS requirements as well as perform on keyword matching.
+8. Only Add Achievements when provided in applicant data
+9. Only Add Courses when provided in applicant data
 
 Output Constraint: Return ONLY the final formatted Markdown resume. Do NOT include any introductory text, explanations, or surrounding Markdown code block fences (\`\`\`md).
 The <left><right> custom tags in the md file need to exist together on same line. If you create one make sure to create the other even if it is blank.
