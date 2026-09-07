@@ -71,12 +71,22 @@ Results-driven Software Engineer with 3+ years of experience building scalable w
 * Received the **Engineering Excellence Award** for improving API performance and reliability.
 * Mentored two junior developers on Python, Git, and API development.`;
 
+// Edit your available models array here
+const MODELS = [
+    "gemini-2.5-flash",
+    "gemini-2.5-pro",
+    "gemini-1.5-flash",
+    "gemini-1.5-pro"
+];
+
 export default {
     async fetch(request, env, ctx) {
         const url = new URL(request.url);
 
         // 1. Serve the MS Word-styled UI
         if (request.method === "GET" && url.pathname === "/") {
+            const modelOptionsHtml = MODELS.map(model => `<option value="${model}">${model}</option>`).join('\n');
+
             const html = `<!DOCTYPE html>
       <html lang="en">
       <head>
@@ -90,8 +100,8 @@ export default {
               .page { max-width: 8.5in; margin: 40px auto; background: white; padding: 1in; box-shadow: 0 2px 10px rgba(0,0,0,0.15); border: 1px solid #D2D2D2; }
               .form-group { margin-bottom: 25px; }
               label { display: block; font-weight: 600; margin-bottom: 8px; color: #444; font-size: 14px; }
-              input[type="password"], input[type="text"] { width: 100%; padding: 12px; border: 1px solid #C8C6C4; font-family: 'Segoe UI', Calibri, sans-serif; font-size: 14px; box-sizing: border-box; background-color: #FAFAFA; }
-              input[type="password"]:focus, input[type="text"]:focus { border-color: #2B579A; outline: none; background-color: #FFF; box-shadow: inset 0 0 0 1px #2B579A; }
+              input[type="password"], input[type="text"], select { width: 100%; padding: 12px; border: 1px solid #C8C6C4; font-family: 'Segoe UI', Calibri, sans-serif; font-size: 14px; box-sizing: border-box; background-color: #FAFAFA; }
+              input[type="password"]:focus, input[type="text"]:focus, select:focus { border-color: #2B579A; outline: none; background-color: #FFF; box-shadow: inset 0 0 0 1px #2B579A; }
               textarea { width: 100%; height: 160px; padding: 12px; border: 1px solid #C8C6C4; font-family: 'Segoe UI', Calibri, sans-serif; font-size: 14px; resize: vertical; box-sizing: border-box; background-color: #FAFAFA; }
               textarea:focus { border-color: #2B579A; outline: none; background-color: #FFF; box-shadow: inset 0 0 0 1px #2B579A; }
               .btn { background-color: #2B579A; color: white; border: none; padding: 10px 24px; cursor: pointer; font-size: 14px; border-radius: 2px; font-weight: 600; }
@@ -109,6 +119,12 @@ export default {
                       <input type="password" id="accessToken" placeholder="Enter your Gemini API Key or Token (optional if server key set)">
                   </div>
                   <div class="form-group">
+                      <label for="modelSelect">Select Model</label>
+                      <select id="modelSelect">
+                          ${modelOptionsHtml}
+                      </select>
+                  </div>
+                  <div class="form-group">
                       <label for="applicant">Applicant Details (Experience, Skills, Background)</label>
                       <textarea id="applicant" required placeholder="Paste applicant data here..."></textarea>
                   </div>
@@ -122,16 +138,21 @@ export default {
           </div>
           <script>
               const tokenInput = document.getElementById('accessToken');
+              const modelSelect = document.getElementById('modelSelect');
               const applicantInput = document.getElementById('applicant');
               const jdInput = document.getElementById('jd');
 
               // Load saved values from localStorage
               tokenInput.value = localStorage.getItem('resume_access_token') || '';
+              if (localStorage.getItem('resume_model')) {
+                  modelSelect.value = localStorage.getItem('resume_model');
+              }
               applicantInput.value = localStorage.getItem('resume_applicant') || '';
               jdInput.value = localStorage.getItem('resume_jd') || '';
 
-              // Persist changes as user types
+              // Persist changes as user edits inputs
               tokenInput.addEventListener('input', () => localStorage.setItem('resume_access_token', tokenInput.value));
+              modelSelect.addEventListener('change', () => localStorage.setItem('resume_model', modelSelect.value));
               applicantInput.addEventListener('input', () => localStorage.setItem('resume_applicant', applicantInput.value));
               jdInput.addEventListener('input', () => localStorage.setItem('resume_jd', jdInput.value));
 
@@ -146,6 +167,7 @@ export default {
                   
                   const payload = {
                       accessToken: tokenInput.value.trim(),
+                      model: modelSelect.value,
                       applicant: applicantInput.value,
                       jd: jdInput.value
                   };
@@ -185,9 +207,10 @@ export default {
         // 2. Handle API request
         if (request.method === "POST" && url.pathname === "/generate") {
             try {
-                const { applicant, jd, accessToken } = await request.json();
+                const { applicant, jd, accessToken, model } = await request.json();
 
                 const apiKey = accessToken || env.GEMINI_API_KEY;
+                const selectedModel = model || MODELS[0];
 
                 if (!apiKey) {
                     return new Response(JSON.stringify({ error: "Gemini API Key / Access Token is required." }), {
@@ -224,7 +247,7 @@ Target the resume to fit in one A4 page. For size reference the sample_resume pr
                     }]
                 };
 
-                const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+                const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
 
                 const geminiResponse = await fetch(geminiUrl, {
                     method: "POST",
