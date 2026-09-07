@@ -70,16 +70,17 @@ Results-driven Software Engineer with 3+ years of experience building scalable w
 
 * Received the **Engineering Excellence Award** for improving API performance and reliability.
 * Mentored two junior developers on Python, Git, and API development.`;
-// Edit your available models array here
+
 const MODELS = [
-    "gemini-3.8-flash"
+    "gemini-3.8-flash",
+    "gemini-3.5-flash",
+    "gemini-3.6-flash"
 ];
 
 export default {
     async fetch(request, env, ctx) {
         const url = new URL(request.url);
 
-        // 1. Serve the MS Word-styled UI
         if (request.method === "GET" && url.pathname === "/") {
             const modelOptionsHtml = MODELS.map(model => `<option value="${model}">${model}</option>`).join('\n');
 
@@ -103,34 +104,17 @@ export default {
               .btn { background-color: #2B579A; color: white; border: none; padding: 10px 24px; cursor: pointer; font-size: 14px; border-radius: 2px; font-weight: 600; }
               .btn:hover { background-color: #1E3E6D; }
               .btn:disabled { background-color: #A0AABF; cursor: not-allowed; }
+              .btn-sample { background-color: transparent; color: #666; border: 1px dashed #A0AABF; padding: 4px 10px; cursor: pointer; font-size: 11px; margin-top: 20px; border-radius: 2px; display: inline-block; }
+              .btn-sample:hover { background-color: #EDEBE9; color: #333; }
               #status { margin-top: 15px; font-size: 14px; color: #2B579A; font-weight: 500; display: none; }
 
-              /* Mobile Adaptations */
               @media (max-width: 768px) {
-                  .ribbon {
-                      padding: 10px 16px;
-                      flex-direction: column;
-                      align-items: flex-start;
-                  }
-                  .ribbon span {
-                      margin-left: 0;
-                      margin-top: 4px;
-                      font-size: 12px;
-                  }
-                  .page {
-                      margin: 0;
-                      padding: 20px 16px;
-                      border: none;
-                      box-shadow: none;
-                      width: 100%;
-                  }
-                  input[type="password"], input[type="text"], select, textarea {
-                      font-size: 16px; /* Prevents auto-zoom on iOS inputs */
-                  }
-                  .btn {
-                      width: 100%;
-                      padding: 12px 16px;
-                  }
+                  .ribbon { padding: 10px 16px; flex-direction: column; align-items: flex-start; }
+                  .ribbon span { margin-left: 0; margin-top: 4px; font-size: 12px; }
+                  .page { margin: 0; padding: 20px 16px; border: none; box-shadow: none; width: 100%; }
+                  input[type="password"], input[type="text"], select, textarea { font-size: 16px; }
+                  .btn { width: 100%; padding: 12px 16px; }
+                  .btn-sample { width: 100%; margin-top: 15px; text-align: center; }
               }
           </style>
       </head>
@@ -158,6 +142,9 @@ export default {
                   </div>
                   <button type="submit" class="btn" id="submitBtn">Generate & Open in New Tab</button>
                   <div id="status">Processing document... please wait.</div>
+                  <div>
+                      <button type="button" class="btn-sample" id="sampleBtn">+ Fill Sample Test Data</button>
+                  </div>
               </form>
           </div>
           <script>
@@ -165,8 +152,63 @@ export default {
               const modelSelect = document.getElementById('modelSelect');
               const applicantInput = document.getElementById('applicant');
               const jdInput = document.getElementById('jd');
+              const sampleBtn = document.getElementById('sampleBtn');
 
-              // Load saved values from localStorage
+              const SAMPLE_APPLICANT = \`Name: Sarah Jenkins
+Email: s.jenkins@email.com | Phone: (555) 019-2834 | Location: Austin, TX | LinkedIn: linkedin.com/in/sjenkins-dev | GitHub: github.com/sjenkins-dev
+
+Summary:
+Full-stack software developer with 4 years of experience delivering high-performance web applications. Specialized in TypeScript, React, Node.js, and cloud deployment on AWS. Proven track record of reducing latency, refactoring legacy codebases, and implementing real-time web features.
+
+Technical Skills:
+- Languages: JavaScript (ES6+), TypeScript, Python, SQL, HTML5, CSS3
+- Frontend: React, Redux, Next.js, Tailwind CSS
+- Backend: Node.js, Express, RESTful APIs, GraphQL
+- Cloud & Infrastructure: AWS (S3, EC2, Lambda), Docker, CI/CD (GitHub Actions)
+- Databases: PostgreSQL, MongoDB, Redis
+- Tools: Git, Jest, Cypress, Postman, Jira
+
+Experience:
+Software Engineer | DataScale Systems | Austin, TX | August 2022 – Present
+- Re-architected core user dashboard using React and TypeScript, improving page load speed by 42%.
+- Designed and integrated 15+ Node.js microservices serving 100k+ daily active users.
+- Migrated legacy database queries to optimized PostgreSQL views, cutting average query execution time from 1.2s to 200ms.
+- Built automated CI/CD pipeline with GitHub Actions, reducing deployment errors by 25%.
+
+Junior Web Developer | PixelCraft Media | Austin, TX | June 2020 – July 2022
+- Developed responsive web interfaces for 20+ client sites using React and Tailwind CSS.
+- Created RESTful API endpoints using Node.js/Express for customer portals.
+- Authored automated unit and integration tests with Jest, increasing test coverage from 45% to 80%.
+
+Education:
+B.S. in Computer Science | University of Texas at Austin | Graduated May 2020
+
+Certifications:
+AWS Certified Developer – Associate (2023)
+
+Achievements:
+- Winner of DataScale Internal Innovation Hackathon (2023) for building an automated log analysis tool.\`;
+
+              const SAMPLE_JD = \`Role: Senior Full Stack Engineer
+Company: CloudScale Technologies
+Location: Remote / Austin, TX
+
+About the Role:
+We are looking for a Senior Full Stack Engineer to lead the design and implementation of modern, high-throughput cloud applications. You will work across frontend interfaces and backend microservices to deliver reliable features to hundreds of thousands of users.
+
+Key Responsibilities:
+- Build and maintain robust web applications using React, TypeScript, and Node.js.
+- Architect, test, and deploy scalable REST and GraphQL APIs.
+- Optimize application performance, query execution times, and frontend bundle sizes.
+- Work closely with AWS infrastructure (Lambda, S3, EC2) and CI/CD pipelines.
+- Mentor junior engineers and champion clean, well-tested code standards.
+
+Qualifications:
+- 3+ years of professional full-stack development experience.
+- Deep expertise in JavaScript/TypeScript, React, Node.js, and PostgreSQL.
+- Experience with cloud providers (AWS) and containerization (Docker).
+- Strong track record of unit testing and performance optimization.\`;
+
               tokenInput.value = localStorage.getItem('resume_access_token') || '';
               if (localStorage.getItem('resume_model')) {
                   modelSelect.value = localStorage.getItem('resume_model');
@@ -174,11 +216,17 @@ export default {
               applicantInput.value = localStorage.getItem('resume_applicant') || '';
               jdInput.value = localStorage.getItem('resume_jd') || '';
 
-              // Persist changes as user edits inputs
               tokenInput.addEventListener('input', () => localStorage.setItem('resume_access_token', tokenInput.value));
               modelSelect.addEventListener('change', () => localStorage.setItem('resume_model', modelSelect.value));
               applicantInput.addEventListener('input', () => localStorage.setItem('resume_applicant', applicantInput.value));
               jdInput.addEventListener('input', () => localStorage.setItem('resume_jd', jdInput.value));
+
+              sampleBtn.addEventListener('click', () => {
+                  applicantInput.value = SAMPLE_APPLICANT;
+                  jdInput.value = SAMPLE_JD;
+                  localStorage.setItem('resume_applicant', SAMPLE_APPLICANT);
+                  localStorage.setItem('resume_jd', SAMPLE_JD);
+              });
 
               document.getElementById('resumeForm').addEventListener('submit', async (e) => {
                   e.preventDefault();
@@ -228,7 +276,6 @@ export default {
             });
         }
 
-        // 2. Handle API request
         if (request.method === "POST" && url.pathname === "/generate") {
             try {
                 const { applicant, jd, accessToken, model } = await request.json();
