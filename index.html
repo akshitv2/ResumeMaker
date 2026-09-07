@@ -1129,9 +1129,6 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
                 preview.style.transform = `scale(${scale})`;
                 preview.style.transformOrigin = 'top left';
 
-                const leftOffset = Math.max(0, (previewPane.clientWidth - (documentWidth * scale)) / 2);
-                preview.style.marginLeft = `${leftOffset}px`;
-
                 const unscaledHeight = preview.offsetHeight || 1122;
                 const scaledHeight = unscaledHeight * scale;
                 preview.style.marginBottom = `-${unscaledHeight - scaledHeight}px`;
