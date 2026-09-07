@@ -70,7 +70,6 @@ Results-driven Software Engineer with 3+ years of experience building scalable w
 
 * Received the **Engineering Excellence Award** for improving API performance and reliability.
 * Mentored two junior developers on Python, Git, and API development.`;
-
 // Edit your available models array here
 const MODELS = [
     "gemini-3.8-flash"
@@ -94,7 +93,7 @@ export default {
               body { font-family: 'Segoe UI', Calibri, sans-serif; background-color: #F3F2F1; margin: 0; padding: 0; }
               .ribbon { background-color: #2B579A; color: white; padding: 12px 24px; font-size: 16px; font-weight: 500; display: flex; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
               .ribbon span { margin-left: 15px; font-size: 14px; opacity: 0.8; }
-              .page { max-width: 8.5in; margin: 40px auto; background: white; padding: 1in; box-shadow: 0 2px 10px rgba(0,0,0,0.15); border: 1px solid #D2D2D2; }
+              .page { max-width: 8.5in; margin: 40px auto; background: white; padding: 1in; box-shadow: 0 2px 10px rgba(0,0,0,0.15); border: 1px solid #D2D2D2; box-sizing: border-box; }
               .form-group { margin-bottom: 25px; }
               label { display: block; font-weight: 600; margin-bottom: 8px; color: #444; font-size: 14px; }
               input[type="password"], input[type="text"], select { width: 100%; padding: 12px; border: 1px solid #C8C6C4; font-family: 'Segoe UI', Calibri, sans-serif; font-size: 14px; box-sizing: border-box; background-color: #FAFAFA; }
@@ -105,6 +104,34 @@ export default {
               .btn:hover { background-color: #1E3E6D; }
               .btn:disabled { background-color: #A0AABF; cursor: not-allowed; }
               #status { margin-top: 15px; font-size: 14px; color: #2B579A; font-weight: 500; display: none; }
+
+              /* Mobile Adaptations */
+              @media (max-width: 768px) {
+                  .ribbon {
+                      padding: 10px 16px;
+                      flex-direction: column;
+                      align-items: flex-start;
+                  }
+                  .ribbon span {
+                      margin-left: 0;
+                      margin-top: 4px;
+                      font-size: 12px;
+                  }
+                  .page {
+                      margin: 0;
+                      padding: 20px 16px;
+                      border: none;
+                      box-shadow: none;
+                      width: 100%;
+                  }
+                  input[type="password"], input[type="text"], select, textarea {
+                      font-size: 16px; /* Prevents auto-zoom on iOS inputs */
+                  }
+                  .btn {
+                      width: 100%;
+                      padding: 12px 16px;
+                  }
+              }
           </style>
       </head>
       <body>
