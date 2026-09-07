@@ -119,6 +119,7 @@
             letter-spacing: 0.5px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
 
         textarea#editor {
@@ -152,7 +153,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             box-sizing: border-box;
             position: relative;
-            transition: all 0.2s ease;
+            transition: transform 0.15s ease;
         }
 
         #resume-preview::before {
@@ -176,6 +177,19 @@
         }
         .flex-left { text-align: left; }
         .flex-right { text-align: right; }
+
+        /* Desktop Text Display */
+        @media screen and (min-width: 769px) {
+            .btn-text-full { display: inline; }
+            .btn-text-mobile { display: none; }
+        }
+
+        /* Mobile specific elements hidden on Desktop */
+        .mobile-view-tabs,
+        .mobile-theme-bar,
+        .mobile-editor-toolbar {
+            display: none;
+        }
 
         .theme-formal {
             font-family: 'Georgia', 'Times New Roman', serif;
@@ -506,9 +520,172 @@
         #resume-preview p { margin-bottom: 6px; }
         #resume-preview a { color: inherit; text-decoration: none; }
 
+        /* =========================================================
+           MOBILE ENHANCEMENTS & RESPONSIVE UX RULES (< 768px)
+           Desktop UI remains 100% unaltered.
+           ========================================================= */
+        @media screen and (max-width: 768px) {
+            body {
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            .word-header {
+                height: 32px;
+                padding: 0 8px;
+                font-size: 11px;
+            }
+
+            .word-header .title span {
+                display: inline-block;
+                max-width: 180px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            /* Static Top Ribbon - No Horizontal Scrolling */
+            .word-ribbon {
+                padding: 4px 6px;
+                gap: 4px;
+                overflow-x: hidden;
+                flex-wrap: nowrap;
+                justify-content: space-between;
+            }
+
+            .ribbon-group {
+                padding-right: 4px;
+                gap: 4px;
+                border-right: 1px solid #d8d8d8;
+            }
+
+            .ribbon-label {
+                display: none !important;
+            }
+
+            /* Hide Theme Dropdown on Mobile */
+            .ribbon-group-theme {
+                display: none !important;
+            }
+
+            select, button, label.btn-upload {
+                padding: 4px 6px;
+                font-size: 11px;
+                gap: 3px;
+            }
+
+            .btn-text-full { display: none !important; }
+            .btn-text-mobile { display: inline !important; }
+
+            /* Mobile Tab View Navigation Bar */
+            .mobile-view-tabs {
+                display: flex;
+                background: #1f3d6d;
+                border-top: 1px solid rgba(255,255,255,0.1);
+            }
+
+            .mobile-tab-btn {
+                flex: 1;
+                padding: 8px 4px;
+                border: none;
+                background: transparent;
+                color: rgba(255,255,255,0.7);
+                font-size: 12px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                border-radius: 0;
+            }
+
+            .mobile-tab-btn.active {
+                color: #ffffff;
+                background: var(--word-blue);
+                border-bottom: 3px solid #60a5fa;
+            }
+
+            /* Mobile Quick Theme Switcher Bar */
+            .mobile-theme-bar {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background: #ffffff;
+                border-bottom: 1px solid var(--word-border);
+                padding: 4px 8px;
+                font-size: 12px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            }
+
+            .mobile-theme-bar button {
+                padding: 3px 8px;
+                font-size: 11px;
+                border-radius: 3px;
+                background: #f0f0f0;
+            }
+
+            .mobile-theme-bar .theme-display {
+                font-weight: 600;
+                color: var(--word-blue-dark);
+                text-align: center;
+                flex: 1;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                padding: 0 6px;
+            }
+
+            /* Workspace Adjustments */
+            .workspace {
+                height: calc(100vh - 105px);
+                flex-direction: column;
+            }
+
+            .editor-pane, .preview-pane {
+                width: 100% !important;
+                height: 100% !important;
+            }
+
+            /* View States */
+            .workspace[data-mobile-view="editor"] .preview-pane { display: none !important; }
+            .workspace[data-mobile-view="preview"] .editor-pane { display: none !important; }
+
+            /* Mobile Markdown Toolbar */
+            .mobile-editor-toolbar {
+                display: flex;
+                gap: 4px;
+                overflow-x: auto;
+                background: #252526;
+                padding: 4px 8px;
+                border-bottom: 1px solid #3c3c3c;
+            }
+
+            .mobile-editor-toolbar button {
+                padding: 3px 8px;
+                font-size: 11px;
+                background: #333333;
+                color: #dddddd;
+                border: 1px solid #444444;
+                border-radius: 3px;
+                white-space: nowrap;
+            }
+
+            /* Mobile Preview Full-Width Scaling */
+            .preview-pane {
+                padding: 10px 8px;
+                overflow-x: hidden;
+                display: block;
+            }
+
+            #resume-preview {
+                transform-origin: top left;
+                margin: 0;
+            }
+        }
+
         @media print {
             body, html { background: white !important; height: auto !important; overflow: visible !important; }
-            .word-header, .word-ribbon, .editor-pane, .pane-header { display: none !important; }
+            .word-header, .word-ribbon, .editor-pane, .pane-header, .mobile-view-tabs, .mobile-theme-bar { display: none !important; }
             .workspace { height: auto !important; display: block !important; overflow: visible !important; }
             .preview-pane { width: 100% !important; padding: 0 !important; background: white !important; overflow: visible !important; }
 
@@ -520,6 +697,7 @@
                 padding: var(--print-margin, 15mm) !important;
                 color: #000000 !important;
                 background: #ffffff !important;
+                transform: none !important;
             }
 
             #resume-preview * {
@@ -545,12 +723,26 @@
 <body>
 
 <div class="word-header">
-    <div class="title"><i class="fa-solid fa-file-word"></i> Resume Document Editor - Markdown Converter</div>
+    <div class="title"><i class="fa-solid fa-file-word"></i> <span>Resume Editor</span></div>
     <div>Word UI Mode</div>
 </div>
 
+<!-- Mobile View Switcher Bar (Editor & Preview only) -->
+<div class="mobile-view-tabs">
+    <button class="mobile-tab-btn active" id="tab-editor" onclick="setMobileView('editor')"><i class="fa-solid fa-code"></i> Editor</button>
+    <button class="mobile-tab-btn" id="tab-preview" onclick="setMobileView('preview')"><i class="fa-solid fa-eye"></i> Preview</button>
+</div>
+
+<!-- Mobile Theme Quick Switcher -->
+<div class="mobile-theme-bar">
+    <button onclick="cycleTheme(-1)"><i class="fa-solid fa-chevron-left"></i> Prev Theme</button>
+    <div class="theme-display" id="mobile-theme-name">Formal Classic</div>
+    <button onclick="cycleTheme(1)">Next Theme <i class="fa-solid fa-chevron-right"></i></button>
+</div>
+
 <div class="word-ribbon">
-    <div class="ribbon-group">
+    <!-- Dropdown theme select group (Hidden on Mobile) -->
+    <div class="ribbon-group ribbon-group-theme">
         <div class="control-item">
             <span class="ribbon-label">Resume Theme</span>
             <select id="theme-select">
@@ -585,7 +777,11 @@
     <div class="ribbon-group">
         <div class="control-item">
             <span class="ribbon-label">Configuration</span>
-            <button id="btn-insert-config" class="btn-primary"><i class="fa-solid fa-sliders"></i> Insert Default Config</button>
+            <button id="btn-insert-config" class="btn-primary">
+                <i class="fa-solid fa-sliders"></i>
+                <span class="btn-text-full">Insert Default Config</span>
+                <span class="btn-text-mobile">Config</span>
+            </button>
         </div>
     </div>
 
@@ -594,10 +790,16 @@
             <span class="ribbon-label">File Operations</span>
             <div style="display:flex; gap: 4px;">
                 <label class="btn-upload">
-                    <i class="fa-solid fa-upload"></i> Upload .md
+                    <i class="fa-solid fa-upload"></i>
+                    <span class="btn-text-full">Upload .md</span>
+                    <span class="btn-text-mobile">Upload</span>
                     <input type="file" id="file-upload" accept=".md,.txt" style="display:none;">
                 </label>
-                <button id="btn-export"><i class="fa-solid fa-download"></i> Export .md</button>
+                <button id="btn-export">
+                    <i class="fa-solid fa-download"></i>
+                    <span class="btn-text-full">Export .md</span>
+                    <span class="btn-text-mobile">Export</span>
+                </button>
             </div>
         </div>
     </div>
@@ -605,21 +807,37 @@
     <div class="ribbon-group">
         <div class="control-item">
             <span class="ribbon-label">Print Output</span>
-            <button id="btn-print" class="btn-primary"><i class="fa-solid fa-print"></i> Print PDF</button>
+            <button id="btn-print" class="btn-primary">
+                <i class="fa-solid fa-print"></i>
+                <span class="btn-text-full">Print PDF</span>
+                <span class="btn-text-mobile">Print</span>
+            </button>
         </div>
     </div>
 </div>
 
-<div class="workspace">
+<div class="workspace" id="workspace" data-mobile-view="editor">
     <div class="editor-pane">
         <div class="pane-header">
             <span>Markdown Input</span>
             <span id="save-status">Saved</span>
         </div>
+
+        <!-- Mobile Editor Helper Bar -->
+        <div class="mobile-editor-toolbar">
+            <button onclick="insertMd('**', '**')"><i class="fa-solid fa-bold"></i></button>
+            <button onclick="insertMd('*', '*')"><i class="fa-solid fa-italic"></i></button>
+            <button onclick="insertMd('## ', '')">H2</button>
+            <button onclick="insertMd('### ', '')">H3</button>
+            <button onclick="insertMd('* ', '')"><i class="fa-solid fa-list-ul"></i></button>
+            <button onclick="insertMd('<left>', '</left><right>Right Text</right>')">Split L/R</button>
+            <button onclick="insertMd('---\n', '')">Line</button>
+        </div>
+
         <textarea id="editor" spellcheck="false" placeholder="Type Markdown here..."></textarea>
     </div>
 
-    <div class="preview-pane">
+    <div class="preview-pane" id="preview-pane">
         <div id="resume-preview" class="theme-formal"></div>
     </div>
 </div>
@@ -713,12 +931,15 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
 
     const editor = document.getElementById('editor');
     const preview = document.getElementById('resume-preview');
+    const previewPane = document.getElementById('preview-pane');
+    const workspace = document.getElementById('workspace');
     const themeSelect = document.getElementById('theme-select');
     const fileUpload = document.getElementById('file-upload');
     const btnExport = document.getElementById('btn-export');
     const btnPrint = document.getElementById('btn-print');
     const btnInsertConfig = document.getElementById('btn-insert-config');
     const saveStatus = document.getElementById('save-status');
+    const mobileThemeName = document.getElementById('mobile-theme-name');
 
     window.addEventListener('DOMContentLoaded', async () => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -745,7 +966,9 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
                 }
             }
         }
+        updateThemeDisplay();
         renderResume();
+        adjustMobileScale();
     });
 
     function parseFrontmatterAndConfig(text) {
@@ -862,7 +1085,79 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
         preview.style.paddingLeft = pLeft;
 
         document.documentElement.style.setProperty('--print-margin', `${pTop} ${pRight} ${pBottom} ${pLeft}`);
+
+        adjustMobileScale();
     }
+
+    /* Mobile UX Functions */
+    function setMobileView(viewMode) {
+        workspace.dataset.mobileView = viewMode;
+        document.querySelectorAll('.mobile-tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`tab-${viewMode}`).classList.add('active');
+        if (viewMode === 'preview') {
+            setTimeout(adjustMobileScale, 50);
+        }
+    }
+
+    function updateThemeDisplay() {
+        const selectedOption = themeSelect.options[themeSelect.selectedIndex];
+        if (selectedOption) {
+            mobileThemeName.textContent = selectedOption.textContent;
+        }
+    }
+
+    function cycleTheme(step) {
+        let totalOptions = themeSelect.options.length;
+        let newIdx = (themeSelect.selectedIndex + step + totalOptions) % totalOptions;
+        themeSelect.selectedIndex = newIdx;
+        preview.className = '';
+        preview.classList.add(themeSelect.value);
+        updateThemeDisplay();
+        renderResume();
+    }
+
+    function adjustMobileScale() {
+        if (window.innerWidth <= 768) {
+            if (workspace.dataset.mobileView === 'editor') return;
+
+            const padding = 16;
+            const availableWidth = previewPane.clientWidth - padding;
+            const documentWidth = 793.7; // 210mm @ 96DPI
+
+            if (availableWidth > 0) {
+                const scale = availableWidth / documentWidth;
+                preview.style.transform = `scale(${scale})`;
+                preview.style.transformOrigin = 'top left';
+
+                const leftOffset = Math.max(0, (previewPane.clientWidth - (documentWidth * scale)) / 2);
+                preview.style.marginLeft = `${leftOffset}px`;
+
+                const unscaledHeight = preview.offsetHeight || 1122;
+                const scaledHeight = unscaledHeight * scale;
+                preview.style.marginBottom = `-${unscaledHeight - scaledHeight}px`;
+            }
+        } else {
+            preview.style.transform = '';
+            preview.style.transformOrigin = '';
+            preview.style.marginLeft = '';
+            preview.style.marginBottom = '';
+        }
+    }
+
+    function insertMd(prefix, suffix) {
+        const start = editor.selectionStart;
+        const end = editor.selectionEnd;
+        const text = editor.value;
+        const selection = text.substring(start, end);
+        const replacement = prefix + selection + suffix;
+
+        editor.value = text.substring(0, start) + replacement + text.substring(end);
+        editor.focus();
+        editor.setSelectionRange(start + prefix.length, end + prefix.length);
+        renderResume();
+    }
+
+    window.addEventListener('resize', adjustMobileScale);
 
     editor.addEventListener('input', () => {
         saveStatus.textContent = 'Saving...';
@@ -872,6 +1167,7 @@ Results-driven **Senior Software Engineer** with over 8 years of experience buil
     themeSelect.addEventListener('change', (e) => {
         preview.className = '';
         preview.classList.add(e.target.value);
+        updateThemeDisplay();
         renderResume();
     });
 
